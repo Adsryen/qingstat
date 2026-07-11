@@ -149,6 +149,17 @@ export type Messages = {
             metricsLater: string;
             metricsLaterDesc: string;
         };
+        site: {
+            hub: string;
+            notInRegistry: string;
+            createdHint: string;
+            codeTitle: string;
+            codeDesc: string;
+            analyticsTitle: string;
+            analyticsDesc: string;
+            emptyHint: string;
+            backList: string;
+        };
         settings: {
             title: string;
             subtitle: string;

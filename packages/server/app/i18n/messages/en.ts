@@ -45,7 +45,7 @@ export const en: Messages = {
     admin: {
         title: "Admin",
         intro:
-            "Manage site metadata. Pageviews still live in Analytics Engine; unknown site IDs can still report via /collect.",
+            "Create a site, install tracking code, then open analytics. Pageviews stay in Analytics Engine.",
         addTitle: "Add site",
         addDesc: "siteId becomes data-site-id in the embed snippet.",
         displayName: "Display name",
@@ -159,6 +159,18 @@ export const en: Messages = {
             step3: "View analytics after traffic arrives",
             metricsLater: "Metrics",
             metricsLaterDesc: "Multi-site summary charts will land in a later phase.",
+        },
+
+        site: {
+            hub: "Site home",
+            notInRegistry: "Not in registry (code & analytics still work)",
+            createdHint: "Site created. Next: get the tracking code and install it.",
+            codeTitle: "Tracking code",
+            codeDesc: "Copy the HTML or npm snippet for this site.",
+            analyticsTitle: "Analytics",
+            analyticsDesc: "Views, trends, referrers, devices, and more.",
+            emptyHint: "After creating a site, get the code and open analytics.",
+            backList: "Back to sites",
         },
         settings: {
             title: "Settings",

@@ -3,7 +3,7 @@ import type {
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router";
-import { Form, useActionData, useLoaderData, useNavigation } from "react-router";
+import { Form, redirect, useActionData, useLoaderData, useNavigation } from "react-router";
 import { useState } from "react";
 
 import {
@@ -85,17 +85,15 @@ export async function action({
             const siteId = String(form.get("siteId") || "");
             const name = String(form.get("name") || "");
             const allowedHosts = String(form.get("allowedHosts") || "");
-            await createSite(db, {
+            const created = await createSite(db, {
                 siteId,
                 name,
                 allowedHosts: allowedHosts || null,
             });
-            return {
-                ok: true,
-                message: translate(messages, "admin.created", {
-                    siteId: siteId.trim(),
-                }),
-            };
+            // Chinese PV flow: create site → land on hub with CTA to install code
+            throw redirect(
+                `/console/sites/${encodeURIComponent(created.siteId)}?created=1`,
+            );
         }
 
         if (intent === "update") {
@@ -128,6 +126,10 @@ export async function action({
             error: translate(messages, "admin.unknownIntent", { intent }),
         };
     } catch (err) {
+        // react-router redirect() throws a Response — rethrow so create flow works
+        if (err instanceof Response) {
+            throw err;
+        }
         const message =
             err instanceof Error ? err.message : "Something went wrong";
         return { ok: false, error: message };
@@ -205,14 +207,21 @@ function SiteRow({ site }: { site: Site }) {
     return (
         <tr className="border-b">
             <td className="py-3 px-2">
-                <div className="font-medium">{site.name}</div>
-                <code className="text-xs bg-muted px-1 rounded">
-                    {site.siteId}
-                </code>
+                <a
+                    href={`/console/sites/${encodeURIComponent(site.siteId)}`}
+                    className="font-medium text-foreground hover:underline"
+                >
+                    {site.name}
+                </a>
+                <div>
+                    <code className="text-xs bg-muted px-1 rounded">
+                        {site.siteId}
+                    </code>
+                </div>
             </td>
             <td className="py-3 px-2 text-sm">
                 {site.enabled ? (
-                    <span className="text-green-700">{t("admin.enabled")}</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">{t("admin.enabled")}</span>
                 ) : (
                     <span className="text-muted-foreground">
                         {t("admin.disabled")}
@@ -226,24 +235,32 @@ function SiteRow({ site }: { site: Site }) {
             </td>
             <td className="py-3 px-2">
                 <div className="flex flex-wrap gap-2">
-                    <Button asChild size="sm" variant="outline">
+                    <Button asChild size="sm" className="rounded-xl">
                         <a
                             href={`/console/sites/${encodeURIComponent(site.siteId)}/code`}
                         >
                             {t("admin.snippet")}
                         </a>
                     </Button>
-                    <Button asChild size="sm" variant="outline">
+                    <Button asChild size="sm" variant="outline" className="rounded-xl">
                         <a
                             href={`/console/sites/${encodeURIComponent(site.siteId)}/analytics`}
                         >
                             {t("admin.dashboard")}
                         </a>
                     </Button>
+                    <Button asChild size="sm" variant="outline" className="rounded-xl">
+                        <a
+                            href={`/console/sites/${encodeURIComponent(site.siteId)}`}
+                        >
+                            {t("console.site.hub")}
+                        </a>
+                    </Button>
                     <Button
                         type="button"
                         size="sm"
                         variant="secondary"
+                        className="rounded-xl"
                         onClick={() => setEditing(true)}
                     >
                         {t("admin.edit")}
@@ -287,20 +304,20 @@ export default function AdminSites() {
     const { t } = useLocale();
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6 mb-12">
+        <div className="max-w-4xl space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold tracking-tight text-foreground">
                     {t("admin.title")}
                 </h1>
-                <p className="text-gray-600 mt-1">{t("admin.intro")}</p>
+                <p className="text-muted-foreground mt-1">{t("admin.intro")}</p>
             </div>
 
             {actionData ? (
                 <div
                     className={
                         actionData.ok
-                            ? "rounded-md border border-green-200 bg-green-50 text-green-900 px-4 py-3 text-sm"
-                            : "rounded-md border border-red-200 bg-red-50 text-red-900 px-4 py-3 text-sm"
+                            ? "rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100 px-4 py-3 text-sm"
+                            : "rounded-2xl border border-red-200 bg-red-50 text-red-900 dark:border-red-900 dark:bg-red-950/40 dark:text-red-100 px-4 py-3 text-sm"
                     }
                     role="status"
                 >
@@ -308,7 +325,7 @@ export default function AdminSites() {
                 </div>
             ) : null}
 
-            <Card>
+            <Card className="rounded-2xl shadow-sm">
                 <CardHeader>
                     <CardTitle>{t("admin.addTitle")}</CardTitle>
                     <CardDescription>{t("admin.addDesc")}</CardDescription>
@@ -366,14 +383,14 @@ export default function AdminSites() {
                                 className="mt-1 w-full px-3 py-2 border border-input rounded-md shadow-sm"
                             />
                         </div>
-                        <Button type="submit" disabled={busy}>
+                        <Button type="submit" disabled={busy} className="rounded-xl">
                             {t("admin.create")}
                         </Button>
                     </Form>
                 </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-2xl shadow-sm">
                 <CardHeader>
                     <CardTitle>{t("admin.sitesTitle")}</CardTitle>
                     <CardDescription>
@@ -383,7 +400,11 @@ export default function AdminSites() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="overflow-x-auto">
-                    {sites.length === 0 ? null : (
+                    {sites.length === 0 ? (
+                        <p className="text-sm text-muted-foreground py-2">
+                            {t("console.site.emptyHint")}
+                        </p>
+                    ) : (
                         <table className="w-full text-left text-sm">
                             <thead>
                                 <tr className="border-b text-muted-foreground">
@@ -408,17 +429,6 @@ export default function AdminSites() {
                     )}
                 </CardContent>
             </Card>
-
-            <div className="text-sm text-muted-foreground">
-                <a
-                    href="/admin-redirect"
-                    className="underline hover:text-foreground"
-                    target="_blank"
-                    rel="noreferrer"
-                >
-                    {t("admin.cfConsole")}
-                </a>
-            </div>
         </div>
     );
 }

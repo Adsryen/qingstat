@@ -170,6 +170,27 @@ export default function Dashboard() {
 
     return (
         <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
+            <p className="text-sm text-muted-foreground mb-3">
+                <a href="/console/sites" className="underline hover:text-foreground">
+                    {t("console.nav.sites")}
+                </a>
+                {" / "}
+                <a
+                    href={`/console/sites/${encodeURIComponent(data.siteId || "")}`}
+                    className="underline hover:text-foreground"
+                >
+                    {data.siteId || t("dashboard.unknownSite")}
+                </a>
+                {" / "}
+                <span>{t("admin.dashboard")}</span>
+                {" · "}
+                <a
+                    href={`/console/sites/${encodeURIComponent(data.siteId || "")}/code`}
+                    className="underline hover:text-foreground"
+                >
+                    {t("admin.snippet")}
+                </a>
+            </p>
             <div className="w-full mb-4 flex gap-4 flex-wrap">
                 <div className="lg:basis-1/5-gap-4 sm:basis-1/4-gap-4 basis-1/2-gap-4">
                     <Select

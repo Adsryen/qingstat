@@ -58,11 +58,18 @@ export default function ConsoleSiteCode() {
         <div className="max-w-3xl space-y-6">
             <div>
                 <p className="text-sm text-muted-foreground mb-1">
-                    <a href="/console/sites" className="underline">
+                    <a href="/console/sites" className="underline hover:text-foreground">
                         {t("console.nav.sites")}
                     </a>
                     {" / "}
-                    <code className="bg-muted px-1 rounded">{siteId}</code>
+                    <a
+                        href={`/console/sites/${encodeURIComponent(siteId)}`}
+                        className="underline hover:text-foreground"
+                    >
+                        {siteId}
+                    </a>
+                    {" / "}
+                    <span>{t("admin.snippet")}</span>
                 </p>
                 <h1 className="text-2xl font-bold">{t("install.title")}</h1>
                 <p className="text-muted-foreground mt-1">{t("install.intro")}</p>
@@ -123,6 +130,11 @@ export default function ConsoleSiteCode() {
                 <Button asChild className="rounded-xl">
                     <a href={`/console/sites/${encodeURIComponent(siteId)}/analytics`}>
                         {t("install.openDashboardSite")}
+                    </a>
+                </Button>
+                <Button asChild variant="outline" className="rounded-xl">
+                    <a href={`/console/sites/${encodeURIComponent(siteId)}`}>
+                        {t("console.site.hub")}
                     </a>
                 </Button>
                 <Button asChild variant="outline" className="rounded-xl">

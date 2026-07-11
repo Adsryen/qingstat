@@ -45,7 +45,7 @@ export const zh: Messages = {
     admin: {
         title: "管理后台",
         intro:
-            "管理站点元数据。访问量仍写入 Analytics Engine；未注册的 site ID 仍可通过 /collect 上报。",
+            "先创建站点，再获取统计代码安装；有流量后查看分析。访问量写入 Analytics Engine。",
         addTitle: "添加站点",
         addDesc: "siteId 会作为嵌入代码中的 data-site-id。",
         displayName: "显示名称",
@@ -152,6 +152,18 @@ export const zh: Messages = {
             step3: "有流量后查看分析",
             metricsLater: "指标",
             metricsLaterDesc: "多站点汇总图表将在后续阶段提供。",
+        },
+
+        site: {
+            hub: "站点主页",
+            notInRegistry: "未在名册中（仍可取码与看数）",
+            createdHint: "站点已创建。下一步：获取统计代码并安装到网站。",
+            codeTitle: "获取统计代码",
+            codeDesc: "复制 HTML 或 npm 片段，粘贴到你的站点。",
+            analyticsTitle: "访问分析",
+            analyticsDesc: "查看 PV、趋势、来源与终端等报表。",
+            emptyHint: "创建站点后，可获取代码并查看分析。",
+            backList: "返回站点列表",
         },
         settings: {
             title: "设置",
