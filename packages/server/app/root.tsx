@@ -27,17 +27,18 @@ function getVersionMeta(version: string | null | undefined): {
 
     // Check if it's a semver (e.g., 1.2.3) or a git SHA
     const isSemver = /^\d+\.\d+\.\d+(?:-[\w.-]+)?(?:\+[\w.-]+)?$/.test(version);
+    const repo = "https://github.com/Adsryen/counterscale";
 
     if (isSemver) {
         // Link to release page for semver
         return {
-            url: `https://github.com/benvinegar/counterscale/releases/tag/v${version}`,
+            url: `${repo}/releases/tag/v${version}`,
             name: version,
         };
     } else {
         // Link to commit for git SHA - show only first 7 characters
         return {
-            url: `https://github.com/benvinegar/counterscale/commit/${version}`,
+            url: `${repo}/commit/${version}`,
             name: version.slice(0, 7),
         };
     }
@@ -147,6 +148,9 @@ export default function App() {
                     </div>
                     <div className="flex items-center font-small font-medium text-md">
                         <a href="/dashboard">Dashboard</a>
+                        <a href="/install" className="ml-2">
+                            Install
+                        </a>
                         <a
                             href="/admin-redirect"
                             target="_blank"
@@ -160,7 +164,7 @@ export default function App() {
                             </a>
                         )}
                         <a
-                            href="https://github.com/benvinegar/counterscale"
+                            href="https://github.com/Adsryen/counterscale"
                             className="w-6 ml-2"
                         >
                             <img

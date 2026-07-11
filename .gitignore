@@ -14,3 +14,13 @@ dist
 coverage
 playwright-report
 __screenshots__
+
+# IDE
+.vscode
+.idea
+.agents/
+.claude/
+.codex/
+.opencode/
+AGENTS.md
+.trellis/
