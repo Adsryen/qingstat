@@ -40,5 +40,6 @@
             "pattern": "pv.we-together.club",
             "custom_domain": true
         }
-    ]
+    ],
+    "workers_dev": true
 }
