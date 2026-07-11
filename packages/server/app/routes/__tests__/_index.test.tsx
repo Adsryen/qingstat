@@ -98,11 +98,11 @@ describe("Index route", () => {
             screen.getByText("Continue to access your analytics dashboard."),
         ).toBeInTheDocument();
 
-        expect(screen.getByText("Go to Dashboard")).toBeInTheDocument();
+        expect(screen.getByText("Go to console")).toBeInTheDocument();
 
         expect(
-            screen.getByRole("link", { name: "Go to Dashboard" }),
-        ).toHaveAttribute("href", "/dashboard");
+            screen.getByRole("link", { name: "Go to console" }),
+        ).toHaveAttribute("href", "/console");
     });
 });
 
@@ -121,7 +121,7 @@ describe("loader function", () => {
         const getUserSpy = vi
             .spyOn(auth, "getUser")
             .mockResolvedValue(mockUser);
-            
+
         // Mock isAuthEnabled for this test
         vi.mocked(auth.isAuthEnabled).mockReturnValue(true);
 
@@ -135,17 +135,24 @@ describe("loader function", () => {
             },
         };
 
-        const result = await loader({
-            request: mockRequest,
-            context: mockContext,
-            params: {},
-        });
-
-        expect(getUserSpy).toHaveBeenCalledWith(
-            mockRequest,
-            mockContext.cloudflare.env,
-        );
-        expect(result).toEqual({ user: mockUser, authEnabled: true });
+        try {
+            await loader({
+                request: mockRequest,
+                context: mockContext,
+                params: {},
+            });
+            expect.unreachable("authenticated users should redirect");
+        } catch (error) {
+            expect(getUserSpy).toHaveBeenCalledWith(
+                mockRequest,
+                mockContext.cloudflare.env,
+            );
+            expect(error).toBeInstanceOf(Response);
+            expect((error as Response).status).toBe(302);
+            expect((error as Response).headers.get("Location")).toBe(
+                "/console",
+            );
+        }
     });
 
     test("should return { authenticated: false } user when not authenticated", async () => {

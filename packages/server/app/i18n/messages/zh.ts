@@ -20,7 +20,7 @@ export const zh: Messages = {
         invalidPassword: "密码错误",
         signIn: "登录",
         signingIn: "登录中…",
-        goDashboard: "进入仪表盘",
+        goDashboard: "进入控制台",
         passwordLabel: "密码",
     },
     install: {
@@ -122,5 +122,38 @@ export const zh: Messages = {
     common: {
         langZh: "中文",
         langEn: "EN",
+    },
+
+    console: {
+        nav: {
+            overview: "概览",
+            sites: "站点管理",
+            settings: "设置",
+        },
+        topbar: {
+            ready: "就绪",
+        },
+        overview: {
+            title: "概览",
+            subtitle: "在统一后台管理站点并查看访问数据。",
+            sitesCard: "站点",
+            sitesCardDesc: "创建站点并获取统计代码。",
+            gotoSites: "管理站点",
+            flowTitle: "上手路径",
+            flowDesc: "PV 统计的典型流程。",
+            step1: "创建站点",
+            step2: "安装埋点代码",
+            step3: "有流量后查看分析",
+            metricsLater: "指标",
+            metricsLaterDesc: "多站点汇总图表将在后续阶段提供。",
+        },
+        settings: {
+            title: "设置",
+            subtitle: "主题、语言与运维入口。",
+            themeTitle: "外观",
+            themeSoon: "跟随系统 / 浅色 / 深色切换将在主题阶段上线。",
+            cfTitle: "Cloudflare",
+            cfDesc: "在 Cloudflare 控制台打开本 Worker。",
+        },
     },
 };

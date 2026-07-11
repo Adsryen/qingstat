@@ -16,7 +16,7 @@ import "vitest-dom/extend-expect";
 import { createRoutesStub } from "react-router";
 import { render, screen, waitFor } from "@testing-library/react";
 
-import Dashboard, { loader } from "../dashboard";
+import Dashboard, { loader } from "../console.sites.$siteId.analytics";
 import { AnalyticsEngineAPI } from "~/analytics/query";
 import { createFetchResponse, getDefaultContext } from "./testutils";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
@@ -59,8 +59,9 @@ describe("Dashboard route", () => {
                 },
                 // @ts-expect-error we don't need to provide all the properties of the cloudflare object
                 request: {
-                    url: "http://localhost:3000/dashboard",
+                    url: "http://localhost:3000/console/sites/x/analytics",
                 },
+                params: { siteId: "x" },
             };
 
             try {
@@ -94,59 +95,21 @@ describe("Dashboard route", () => {
             }
         });
 
-        test("redirects to ?site=siteId if no siteId is provided via query string", async () => {
-            // response for getSitesByOrderedHits
-            fetch.mockResolvedValueOnce(
-                createFetchResponse({
-                    data: [{ siteId: "test-siteid", count: 1 }],
-                }),
-            );
-
+        test("redirects to /console/sites if no siteId param", async () => {
             try {
                 await loader({
                     ...getDefaultContext(),
-                    // @ts-expect-error we don't need to provide all the properties of the request object
+                    // @ts-expect-error partial request
                     request: {
-                        url: "http://localhost:3000/dashboard", // no site query param
+                        url: "http://localhost:3000/console/sites//analytics",
                     },
+                    params: {},
                 });
             } catch (error) {
                 expect(error).toBeInstanceOf(Response);
                 const response = error as Response;
-
-                // expect redirect
                 expect(response.status).toBe(302);
-                expect(response.headers.get("Location")).toBe(
-                    "http://localhost:3000/dashboard?site=test-siteid",
-                );
-            }
-        });
-
-        test("redirects to ?site= if no siteId is provided via query string / no site data", async () => {
-            // response for getSitesByOrderedHits
-            fetch.mockResolvedValueOnce(
-                createFetchResponse({
-                    data: [],
-                }),
-            );
-
-            try {
-                await loader({
-                    ...getDefaultContext(),
-                    // @ts-expect-error we don't need to provide all the properties of the request object
-                    request: {
-                        url: "http://localhost:3000/dashboard", // no site query param
-                    },
-                });
-            } catch (error) {
-                expect(error).toBeInstanceOf(Response);
-                const response = error as Response;
-
-                // expect redirect
-                expect(response.status).toBe(302);
-                expect(response.headers.get("Location")).toBe(
-                    "http://localhost:3000/dashboard?site=",
-                );
+                expect(response.headers.get("Location")).toBe("/console/sites");
             }
         });
 
@@ -179,30 +142,21 @@ describe("Dashboard route", () => {
             });
         });
 
-        test("returns a valid empty result set when no data (no sites, no anything)", async () => {
-            vi.setSystemTime(new Date("2024-01-18T09:33:02").getTime());
-
-            fetch.mockResolvedValueOnce(createFetchResponse({ data: [] })); // getSitesOrderedByHits
-            fetch.mockResolvedValueOnce(createFetchResponse({ data: [] })); // get counts
-            fetch.mockResolvedValueOnce(createFetchResponse({ data: [] })); // getViewsGroupedByInterval
-
-            const response = await loader({
-                ...getDefaultContext(),
-                // @ts-expect-error we don't need to provide all the properties of the request object
-                request: {
-                    url: "http://localhost:3000/dashboard?site=", // intentionally empty
-                },
-            });
-
-            const json = await response;
-
-            expect(json).toEqual({
-                filters: {},
-                siteId: "",
-                sites: [],
-                intervalType: "DAY",
-                interval: "7d",
-            });
+        test("redirects when siteId empty", async () => {
+            try {
+                await loader({
+                    ...getDefaultContext(),
+                    // @ts-expect-error partial
+                    request: {
+                        url: "http://localhost:3000/console/sites//analytics",
+                    },
+                    params: { siteId: "" },
+                });
+                expect.unreachable("should redirect");
+            } catch (error) {
+                expect(error).toBeInstanceOf(Response);
+                expect((error as Response).status).toBe(302);
+            }
         });
     });
 

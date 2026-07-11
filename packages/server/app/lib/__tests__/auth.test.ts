@@ -102,7 +102,7 @@ describe("auth", () => {
             expect(decoded.iss).toBe("counterscale");
 
             expect(result).toEqual({
-                url: "/dashboard",
+                url: "/console",
                 options: {
                     headers: {
                         "Set-Cookie":
@@ -136,7 +136,7 @@ describe("auth", () => {
             
             // Should redirect directly to dashboard without setting cookie
             expect(result).toEqual({
-                url: "/dashboard",
+                url: "/console",
                 options: undefined,
             });
         });

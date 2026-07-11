@@ -120,6 +120,38 @@ export type Messages = {
         langZh: string;
         langEn: string;
     };
+    console: {
+        nav: {
+            overview: string;
+            sites: string;
+            settings: string;
+        };
+        topbar: {
+            ready: string;
+        };
+        overview: {
+            title: string;
+            subtitle: string;
+            sitesCard: string;
+            sitesCardDesc: string;
+            gotoSites: string;
+            flowTitle: string;
+            flowDesc: string;
+            step1: string;
+            step2: string;
+            step3: string;
+            metricsLater: string;
+            metricsLaterDesc: string;
+        };
+        settings: {
+            title: string;
+            subtitle: string;
+            themeTitle: string;
+            themeSoon: string;
+            cfTitle: string;
+            cfDesc: string;
+        };
+    };
 };
 
 export type MessageKey = string;

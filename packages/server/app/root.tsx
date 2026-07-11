@@ -201,10 +201,50 @@ function AppShell({
     data: ReturnType<typeof useLoaderData<typeof loader>>;
 }) {
     const { t } = useLocale();
+    const path = typeof window !== "undefined" ? window.location.pathname : "";
+    // Prefer URL from loader (SSR-safe)
+    let pathname = "/";
+    try {
+        pathname = new URL(data.url).pathname;
+    } catch {
+        pathname = path || "/";
+    }
+    const isConsole = pathname.startsWith("/console");
+    const isLoginOnly =
+        pathname === "/" || pathname === "";
 
+    if (isConsole) {
+        // Console routes render their own chrome; keep only content + locale.
+        return (
+            <div className="mt-0 sm:mt-4">
+                <main role="main" className="w-full">
+                    <Outlet />
+                </main>
+                <footer className="py-4 flex justify-end text-s text-muted-foreground">
+                    <div>
+                        {t("footer.version")}{" "}
+                        {data.version ? (
+                            <a
+                                href={data.version.url as string}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:underline"
+                            >
+                                {data.version.name}
+                            </a>
+                        ) : (
+                            "unknown"
+                        )}
+                    </div>
+                </footer>
+            </div>
+        );
+    }
+
+    // Public / login shell — minimal chrome
     return (
         <div className="mt-0 sm:mt-4">
-            <header className="border-b-2 mb-8 py-2">
+            <header className="border-b border-border/60 mb-8 py-3">
                 <nav className="flex justify-between items-center">
                     <div className="flex items-center">
                         <a href={homeUrl} className="text-lg font-bold">
@@ -216,43 +256,23 @@ function AppShell({
                             alt="Counterscale Icon"
                         />
                     </div>
-                    <div className="flex items-center font-small font-medium text-md">
-                        <a href="/dashboard">{t("nav.dashboard")}</a>
-                        <a href="/install" className="ml-2">
-                            {t("nav.install")}
-                        </a>
-                        <a
-                            href="/admin"
-                            className="hidden sm:inline-block ml-2"
-                        >
-                            {t("nav.admin")}
-                        </a>
-                        {data.user?.authenticated && data.isAuthEnabled && (
-                            <a href="/logout" className="ml-2">
-                                {t("nav.logout")}
-                            </a>
-                        )}
+                    <div className="flex items-center gap-2">
                         <LanguageSwitcher />
-                        <a
-                            href="https://github.com/Adsryen/counterscale"
-                            className="w-6 ml-2"
-                        >
-                            <img
-                                src="/github-mark.svg"
-                                alt="GitHub Logo"
-                                style={{
-                                    filter: "invert(21%) sepia(27%) saturate(271%) hue-rotate(113deg) brightness(97%) contrast(97%)",
-                                }}
-                            />
-                        </a>
+                        {data.user?.authenticated && data.isAuthEnabled ? (
+                            <a
+                                href="/console"
+                                className="text-sm font-medium ml-1"
+                            >
+                                {t("console.nav.overview")}
+                            </a>
+                        ) : null}
                     </div>
                 </nav>
             </header>
             <main role="main" className="w-full">
                 <Outlet />
             </main>
-
-            <footer className="py-4 flex justify-end text-s">
+            <footer className="py-4 flex justify-end text-s text-muted-foreground">
                 <div>
                     {t("footer.version")}{" "}
                     {data.version ? (

@@ -26,6 +26,10 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     const user = await getUser(request, env);
     const authEnabled = isAuthEnabled(env);
 
+    if (!authEnabled || user?.authenticated) {
+        throw redirect("/console");
+    }
+
     // Return auth status to conditionally render the login form
     return { user, authEnabled };
 }
@@ -35,7 +39,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
     // If auth is disabled, this action shouldn't be called, but handle it gracefully
     if (!isAuthEnabled(env)) {
-        return redirect("/dashboard");
+        return redirect("/console");
     }
 
     const formData = await request.formData();
@@ -89,7 +93,7 @@ export default function Index() {
                 {/* When auth is disabled or user is already authenticated, show dashboard button */}
                 {!authEnabled || user?.authenticated ? (
                     <Button asChild className="w-full">
-                        <a href="/dashboard">{t("login.goDashboard")}</a>
+                        <a href="/console">{t("login.goDashboard")}</a>
                     </Button>
                 ) : (
                     /* When auth is enabled and user is not authenticated, show login form */

@@ -20,7 +20,7 @@ export const en: Messages = {
         invalidPassword: "Invalid password",
         signIn: "Sign In",
         signingIn: "Signing In...",
-        goDashboard: "Go to Dashboard",
+        goDashboard: "Go to console",
         passwordLabel: "Password",
     },
     install: {
@@ -129,5 +129,38 @@ export const en: Messages = {
     common: {
         langZh: "中文",
         langEn: "EN",
+    },
+
+    console: {
+        nav: {
+            overview: "Overview",
+            sites: "Sites",
+            settings: "Settings",
+        },
+        topbar: {
+            ready: "Ready",
+        },
+        overview: {
+            title: "Overview",
+            subtitle: "Manage sites and review traffic from one console.",
+            sitesCard: "Sites",
+            sitesCardDesc: "Create properties and open tracking code.",
+            gotoSites: "Manage sites",
+            flowTitle: "Getting started",
+            flowDesc: "Typical flow for PV analytics.",
+            step1: "Create a site",
+            step2: "Install tracking code",
+            step3: "View analytics after traffic arrives",
+            metricsLater: "Metrics",
+            metricsLaterDesc: "Multi-site summary charts will land in a later phase.",
+        },
+        settings: {
+            title: "Settings",
+            subtitle: "Theme, language, and operations links.",
+            themeTitle: "Appearance",
+            themeSoon: "System / light / dark toggle arrives in the theme phase.",
+            cfTitle: "Cloudflare",
+            cfDesc: "Open the Worker in Cloudflare dashboard.",
+        },
     },
 };

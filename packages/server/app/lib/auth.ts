@@ -31,9 +31,9 @@ export function isAuthEnabled(env: Env): boolean {
 }
 
 export async function login(_request: Request, password: string, env: Env) {
-    // If auth is disabled, redirect directly to dashboard
+    // If auth is disabled, redirect directly to console
     if (!isAuthEnabled(env)) {
-        return redirect("/dashboard");
+        return redirect("/console");
     }
 
     const isValidPassword = await bcrypt.compare(
@@ -56,7 +56,7 @@ export async function login(_request: Request, password: string, env: Env) {
         },
     );
 
-    return redirect("/dashboard", {
+    return redirect("/console", {
         headers: {
             "Set-Cookie": createJWTCookie(token),
         },
