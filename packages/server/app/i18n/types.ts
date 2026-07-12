@@ -145,6 +145,12 @@ export type Messages = {
         uv: string;
         pv: string;
         bounce: string;
+        region: string;
+        city: string;
+        country: string;
+        geoMap: string;
+        geoMapDesc: string;
+        geoMapEmpty: string;
     };
     common: {
         langZh: string;

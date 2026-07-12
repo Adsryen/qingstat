@@ -4,6 +4,8 @@ export interface SearchFilters {
     deviceModel?: string;
     deviceType?: string;
     country?: string;
+    region?: string;
+    city?: string;
     browserName?: string;
     browserVersion?: string;
     utmSource?: string;

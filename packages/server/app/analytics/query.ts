@@ -138,6 +138,8 @@ function filtersToSql(filters: SearchFilters) {
         "browserName",
         "browserVersion",
         "country",
+        "region",
+        "city",
         "deviceType",
         "utmSource",
         "utmMedium",
@@ -877,6 +879,115 @@ export class AnalyticsEngineAPI {
             filters,
             page,
         );
+    }
+
+    async getCountByRegion(
+        siteId: string,
+        interval: string,
+        tz?: string,
+        filters: SearchFilters = {},
+        page: number = 1,
+    ): Promise<[region: string, visitors: number][]> {
+        return this.getVisitorCountByColumn(
+            siteId,
+            "region",
+            interval,
+            tz,
+            filters,
+            page,
+        );
+    }
+
+    async getCountByCity(
+        siteId: string,
+        interval: string,
+        tz?: string,
+        filters: SearchFilters = {},
+        page: number = 1,
+    ): Promise<[city: string, visitors: number][]> {
+        return this.getVisitorCountByColumn(
+            siteId,
+            "city",
+            interval,
+            tz,
+            filters,
+            page,
+        );
+    }
+
+    /**
+     * City-level map points for dashboards.
+     * Groups visitors by city + rounded lat/lon (CF edge geo, not raw IP).
+     */
+    async getGeoPoints(
+        siteId: string,
+        interval: string,
+        tz?: string,
+        filters: SearchFilters = {},
+        limit: number = 100,
+    ): Promise<
+        {
+            city: string;
+            region: string;
+            country: string;
+            latitude: number;
+            longitude: number;
+            visitors: number;
+        }[]
+    > {
+        const { startIntervalSql, endIntervalSql } = intervalToSql(
+            interval,
+            tz,
+        );
+        const filterStr = filtersToSql(filters);
+        const safeLimit = Math.max(1, Math.min(200, Math.floor(limit) || 100));
+
+        // Round coordinates so near-identical CF points collapse for map markers.
+        const query = `
+            SELECT
+                ${ColumnMappings.city} as city,
+                ${ColumnMappings.region} as region,
+                ${ColumnMappings.country} as country,
+                floor(${ColumnMappings.latitude} * 100) / 100 as latitude,
+                floor(${ColumnMappings.longitude} * 100) / 100 as longitude,
+                SUM(_sample_interval) as visitors
+            FROM metricsDataset
+            WHERE timestamp >= ${startIntervalSql} AND timestamp < ${endIntervalSql}
+                AND ${ColumnMappings.newVisitor} = 1
+                AND ${ColumnMappings.siteId} = '${siteId}'
+                AND ${ColumnMappings.latitude} != 0
+                AND ${ColumnMappings.longitude} != 0
+                ${filterStr}
+            GROUP BY city, region, country, latitude, longitude
+            ORDER BY visitors DESC
+            LIMIT ${safeLimit}`;
+
+        type SelectionSet = {
+            city: string;
+            region: string;
+            country: string;
+            latitude: number;
+            longitude: number;
+            visitors: number;
+        };
+
+        const response = await this.query(query);
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+        const responseData =
+            (await response.json()) as AnalyticsQueryResult<SelectionSet>;
+
+        return (responseData.data || [])
+            .map((row) => ({
+                city: row.city || "",
+                region: row.region || "",
+                country: row.country || "",
+                latitude: Number(row.latitude) || 0,
+                longitude: Number(row.longitude) || 0,
+                visitors: Number(row.visitors) || 0,
+            }))
+            .filter((p) => p.latitude !== 0 && p.longitude !== 0);
     }
 
     async getSitesOrderedByHits(interval: string, limit?: number) {

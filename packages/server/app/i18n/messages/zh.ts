@@ -152,6 +152,12 @@ export const zh: Messages = {
         uv: "访客 (UV)",
         pv: "浏览量 (PV)",
         bounce: "跳出率",
+        region: "行政区/省",
+        city: "城市",
+        country: "国家/地区",
+        geoMap: "访问地图",
+        geoMapDesc: "基于 Cloudflare 边缘地理（城市级），不存储访客原始 IP。适合行政区打点。",
+        geoMapEmpty: "暂无坐标点。新安装后需有真实访问，且 CF 能解析到经纬度。",
     },
     theme: {
         label: "主题",

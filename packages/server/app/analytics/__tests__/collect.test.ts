@@ -111,6 +111,11 @@ describe("collectRequestHandler", () => {
 
         collectRequestHandler(request as any, env, {
             country: "US",
+            region: "California",
+            city: "San Francisco",
+            regionCode: "CA",
+            latitude: "37.7749",
+            longitude: "-122.4194",
         });
 
         const writeDataPoint = env.WEB_COUNTER_AE.writeDataPoint;
@@ -134,11 +139,16 @@ describe("collectRequestHandler", () => {
                 "summer_sale", // utm_campaign
                 "running_shoes", // utm_term
                 "ad1", // utm_content
+                "California", // region
+                "San Francisco", // city
+                "CA", // regionCode
             ],
             doubles: [
                 1, // new visitor
                 0, // DEAD COLUMN (was session)
                 1, // new visit, so bounce
+                37.7749, // latitude
+                -122.4194, // longitude
             ],
             indexes: [
                 "example", // site id is index
@@ -164,7 +174,9 @@ describe("collectRequestHandler", () => {
             [
                 1, // new visitor
                 0, // DEAD COLUMN (was session)
-                1, // new visit, so bounce
+                1, // new visit, so bounce,
+                0,
+                0,
             ],
         );
     });
@@ -193,7 +205,9 @@ describe("collectRequestHandler", () => {
             [
                 0, // NOT a new visitor
                 0, // DEAD COLUMN (was session)
-                0, // NOT first or second visit
+                0, // NOT first or second visit,
+                0,
+                0,
             ],
         );
     });
@@ -227,7 +241,9 @@ describe("collectRequestHandler", () => {
             [
                 1, // new visitor because a new day began
                 0, // DEAD COLUMN (was session)
-                1, // new visitor so bounce counted
+                1, // new visitor so bounce counted,
+                0,
+                0,
             ],
         );
     });
@@ -257,6 +273,8 @@ describe("collectRequestHandler", () => {
                 1, // new visitor because > 30 days passed
                 0, // DEAD COLUMN (was session)
                 1, // new visitor so bounce
+                0,
+                0,
             ],
         );
     });
@@ -286,6 +304,8 @@ describe("collectRequestHandler", () => {
                 1, // new visitor because > 24 hours passed
                 0, // DEAD COLUMN (was session)
                 1, // new visitor so bounce
+                0,
+                0,
             ],
         );
     });
@@ -322,7 +342,9 @@ describe("collectRequestHandler", () => {
             [
                 0, // NOT a new visitor
                 0, // DEAD COLUMN (was session)
-                -1, // First visit after the initial visit so decrement bounce
+                -1, // First visit after the initial visit so decrement bounce,
+                0,
+                0,
             ],
         );
     });
@@ -361,7 +383,9 @@ describe("collectRequestHandler", () => {
             [
                 0, // NOT a new visitor
                 0, // DEAD COLUMN (was session)
-                0, // After the second visit so no bounce
+                0, // After the second visit so no bounce,
+                0,
+                0,
             ],
         );
     });

@@ -31,6 +31,9 @@ import { PathsCard } from "./resources.paths";
 import { BrowserCard } from "./resources.browser";
 import { BrowserVersionCard } from "./resources.browserversion";
 import { CountryCard } from "./resources.country";
+import { RegionCard } from "./resources.region";
+import { CityCard } from "./resources.city";
+import { GeoMapCard } from "./resources.geo";
 import { DeviceCard } from "./resources.device";
 import { UtmSourceCard } from "./resources.utm-source";
 import { UtmMediumCard } from "./resources.utm-medium";
@@ -309,6 +312,14 @@ export default function Dashboard() {
                         timezone={userTimezone}
                     />
                 </div>
+                <div className="w-full mb-4">
+                    <GeoMapCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        timezone={userTimezone}
+                    />
+                </div>
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
                     <PathsCard
                         siteId={data.siteId}
@@ -353,6 +364,22 @@ export default function Dashboard() {
                     />
 
                     <DeviceCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        onFilterChange={handleFilterChange}
+                        timezone={userTimezone}
+                    />
+                </div>
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
+                    <RegionCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        onFilterChange={handleFilterChange}
+                        timezone={userTimezone}
+                    />
+                    <CityCard
                         siteId={data.siteId}
                         interval={data.interval}
                         filters={data.filters}

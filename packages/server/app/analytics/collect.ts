@@ -130,10 +130,35 @@ function getDeviceTypeFromDevice(device: IDevice): string {
     return device.type === undefined ? "desktop" : device.type;
 }
 
+/** Cloudflare edge geolocation fields we persist (never raw client IP). */
+export type CollectGeoExtra = {
+    country?: unknown;
+    region?: unknown;
+    city?: unknown;
+    regionCode?: unknown;
+    latitude?: unknown;
+    longitude?: unknown;
+};
+
+function asTrimmedString(value: unknown): string | undefined {
+    if (typeof value !== "string") return undefined;
+    const trimmed = value.trim();
+    return trimmed ? trimmed : undefined;
+}
+
+function asFiniteNumber(value: unknown): number | undefined {
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+    if (typeof value === "string" && value.trim() !== "") {
+        const n = Number(value);
+        if (Number.isFinite(n)) return n;
+    }
+    return undefined;
+}
+
 export function collectRequestHandler(
     request: Request,
     env: Env,
-    extra: Record<string, string> = {}, // extra request properties (i.e. Cloudflare properties)
+    extra: CollectGeoExtra = {}, // Cloudflare request.cf geolocation properties
 ) {
     const params = extractParamsFromQueryString(request.url);
 
@@ -201,12 +226,15 @@ export function collectRequestHandler(
         utmContent: params.uco,
     };
 
-    // NOTE: location is derived from Cloudflare-specific request properties
+    // Location is derived from Cloudflare edge geolocation — city/region level.
+    // Raw client IPs are intentionally not stored (privacy + map-ready admin areas).
     // see: https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties
-    const country = extra?.country;
-    if (typeof country === "string") {
-        data.country = country;
-    }
+    data.country = asTrimmedString(extra?.country);
+    data.region = asTrimmedString(extra?.region);
+    data.city = asTrimmedString(extra?.city);
+    data.regionCode = asTrimmedString(extra?.regionCode);
+    data.latitude = asFiniteNumber(extra?.latitude);
+    data.longitude = asFiniteNumber(extra?.longitude);
 
     writeDataPoint(env.WEB_COUNTER_AE, data);
 
@@ -258,15 +286,20 @@ interface DataPoint {
     utmCampaign?: string;
     utmTerm?: string;
     utmContent?: string;
+    region?: string;
+    city?: string;
+    regionCode?: string;
 
     // doubles
     newVisitor: number;
     newSession: number;
     bounce: number;
+    latitude?: number;
+    longitude?: number;
 }
 
 // NOTE: Cloudflare Analytics Engine has limits on total number of bytes, number of fields, etc.
-// More here: https://developers.cloudflare.com/analytics/analytics-engine/get-started/#limits
+// More here: https://developers.cloudflare.com/analytics/analytics-engine/limits/
 
 export function writeDataPoint(
     analyticsEngine: AnalyticsEngineDataset,
@@ -290,8 +323,18 @@ export function writeDataPoint(
             data.utmCampaign || "", // blob13
             data.utmTerm || "", // blob14
             data.utmContent || "", // blob15
+            data.region || "", // blob16
+            data.city || "", // blob17
+            data.regionCode || "", // blob18
         ],
-        doubles: [data.newVisitor || 0, data.newSession || 0, data.bounce],
+        doubles: [
+            data.newVisitor || 0,
+            data.newSession || 0,
+            data.bounce,
+            // 0 means unknown / not provided (CF geo may be absent offline)
+            data.latitude ?? 0,
+            data.longitude ?? 0,
+        ],
     };
 
     if (!analyticsEngine) {

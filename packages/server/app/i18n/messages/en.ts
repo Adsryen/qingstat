@@ -159,6 +159,12 @@ export const en: Messages = {
         uv: "Visitors (UV)",
         pv: "Pageviews (PV)",
         bounce: "Bounce rate",
+        region: "Region",
+        city: "City",
+        country: "Country",
+        geoMap: "Visitor map",
+        geoMapDesc: "City-level points from Cloudflare edge geolocation. Raw visitor IPs are not stored.",
+        geoMapEmpty: "No coordinates yet. Needs live traffic with CF lat/lon available.",
     },
     theme: {
         label: "Theme",
