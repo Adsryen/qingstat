@@ -147,6 +147,8 @@ export const zh: Messages = {
         system: "系统",
         light: "浅色",
         dark: "深色",
+        switchToLight: "切换到浅色模式",
+        switchToDark: "切换到深色模式",
     },
 
     console: {
@@ -196,7 +198,8 @@ export const zh: Messages = {
             title: "设置",
             subtitle: "主题、语言与运维入口。",
             themeTitle: "外观",
-            themeDesc: "可跟随系统，或固定浅色 / 深色；选择会写入 Cookie 并记住。",
+            themeDesc: "点击太阳 / 月亮图标切换浅色与深色，选择会写入 Cookie。",
+            themeClickHint: "点击图标切换日夜模式",
             langTitle: "语言",
             langDesc: "界面语言会写入 Cookie，刷新后保持。",
             aboutTitle: "关于",

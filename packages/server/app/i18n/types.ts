@@ -144,6 +144,8 @@ export type Messages = {
         system: string;
         light: string;
         dark: string;
+        switchToLight: string;
+        switchToDark: string;
     };
     console: {
         nav: {
@@ -192,6 +194,7 @@ export type Messages = {
             subtitle: string;
             themeTitle: string;
             themeDesc: string;
+            themeClickHint: string;
             langTitle: string;
             langDesc: string;
             aboutTitle: string;

@@ -154,6 +154,8 @@ export const en: Messages = {
         system: "System",
         light: "Light",
         dark: "Dark",
+        switchToLight: "Switch to light mode",
+        switchToDark: "Switch to dark mode",
     },
 
     console: {
@@ -203,7 +205,8 @@ export const en: Messages = {
             title: "Settings",
             subtitle: "Theme, language, and operations links.",
             themeTitle: "Appearance",
-            themeDesc: "Follow system appearance, or force light / dark. Preference is saved in a cookie.",
+            themeDesc: "Click the sun / moon icon to toggle light and dark. Preference is saved in a cookie.",
+            themeClickHint: "Click the icon to toggle day / night",
             langTitle: "Language",
             langDesc: "UI language is saved in a cookie.",
             aboutTitle: "About",

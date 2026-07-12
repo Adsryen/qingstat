@@ -23,7 +23,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
 
 export default function ConsoleSettings() {
     const { t, locale, setLocale } = useLocale();
-    const { preference, resolved } = useTheme();
+    const { resolved } = useTheme();
     const { version } = useLoaderData<typeof loader>();
 
     return (
@@ -46,14 +46,12 @@ export default function ConsoleSettings() {
                         {t("console.settings.themeDesc")}
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
+                <CardContent className="flex flex-col sm:flex-row sm:items-center gap-4">
                     <ThemeSwitcher size="md" />
-                    <p className="text-xs text-muted-foreground">
-                        {preference === "system"
-                            ? `${t("theme.system")} → ${resolved === "dark" ? t("theme.dark") : t("theme.light")}`
-                            : preference === "dark"
-                              ? t("theme.dark")
-                              : t("theme.light")}
+                    <p className="text-sm text-muted-foreground">
+                        {resolved === "dark" ? t("theme.dark") : t("theme.light")}
+                        {" · "}
+                        {t("console.settings.themeClickHint")}
                     </p>
                 </CardContent>
             </Card>
