@@ -23,7 +23,6 @@ import {
     useNavigation,
     useRouteError,
     useSearchParams,
-    useParams,
 } from "react-router";
 
 import { ReferrerCard } from "./resources.referrer";
@@ -64,7 +63,7 @@ export const meta: MetaFunction = () => {
 
 const MAX_RETENTION_DAYS = 90;
 
-export const loader = async ({ context, request, params }: LoaderFunctionArgs) => {
+export const loader = async ({ context, request }: LoaderFunctionArgs) => {
     // NOTE: probably duped from getLoadContext / need to de-duplicate
     if (!context.cloudflare?.env?.CF_ACCOUNT_ID) {
         throw new Response("Missing credentials: CF_ACCOUNT_ID is not set.", {
@@ -96,7 +95,9 @@ export const loader = async ({ context, request, params }: LoaderFunctionArgs) =
         const sitesByHits = await analyticsEngine.getSitesOrderedByHits(
             `${MAX_RETENTION_DAYS}d`,
         );
-        candidateIds = sitesByHits.map(([site]) => site).filter(Boolean);
+        candidateIds = sitesByHits
+            .map(([site]: [string, number]) => site)
+            .filter(Boolean);
     } catch (err) {
         console.error(err);
         throw new Error("Failed to fetch data from Analytics Engine");

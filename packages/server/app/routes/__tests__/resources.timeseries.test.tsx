@@ -10,6 +10,7 @@ import { getDefaultContext } from "./testutils";
 
 vi.mock("~/lib/auth", () => ({
     requireAuth: vi.fn(),
+    isAuthEnabled: vi.fn(() => false),
 }));
 
 // Mock the useFetcher hook

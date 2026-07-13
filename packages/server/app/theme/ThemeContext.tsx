@@ -56,7 +56,11 @@ export function ThemeProvider({
         };
         apply();
 
-        if (preference !== "system" || typeof window === "undefined") {
+        if (
+            preference !== "system" ||
+            typeof window === "undefined" ||
+            typeof window.matchMedia !== "function"
+        ) {
             return;
         }
         const mq = window.matchMedia("(prefers-color-scheme: dark)");

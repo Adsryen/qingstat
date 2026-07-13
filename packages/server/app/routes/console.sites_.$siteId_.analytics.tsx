@@ -23,7 +23,6 @@ import {
     useNavigation,
     useRouteError,
     useSearchParams,
-    useParams,
 } from "react-router";
 
 import { ReferrerCard } from "./resources.referrer";
@@ -62,7 +61,11 @@ export const meta: MetaFunction = () => {
 
 const MAX_RETENTION_DAYS = 90;
 
-export const loader = async ({ context, request, params }: LoaderFunctionArgs) => {
+export const loader = async ({
+    context,
+    request,
+    params = {},
+}: LoaderFunctionArgs) => {
     await requireAuth(request, context.cloudflare.env);
 
     // NOTE: probably duped from getLoadContext / need to de-duplicate

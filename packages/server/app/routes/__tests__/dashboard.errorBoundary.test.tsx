@@ -2,7 +2,7 @@
 import { vi, test, describe, beforeEach, afterEach, expect } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import "vitest-dom/extend-expect";
-import { ErrorBoundary } from "../console.sites.$siteId.analytics";
+import { ErrorBoundary } from "../console.sites_.$siteId_.analytics";
 
 vi.mock("react-router", async () => {
     const actual = await vi.importActual("react-router");
@@ -299,7 +299,7 @@ describe("Dashboard ErrorBoundary", () => {
             const backButton = screen.getByText("Back to Dashboard");
             fireEvent.click(backButton);
 
-            expect(global.window.location.href).toBe("/console/sites/blog/analytics");
+            expect(global.window.location.href).toBe("/console");
         });
     });
 

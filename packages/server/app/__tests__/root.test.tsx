@@ -51,7 +51,7 @@ describe("Root", () => {
 
         render(<RemixStub />);
         // wait until the rows render in the document
-        await waitFor(() => screen.findByText("Version"));
+        await waitFor(() => screen.findByText("\u7248\u672c"));
         expect(screen.getByText("ABC123")).toBeInTheDocument();
     });
 
@@ -84,10 +84,10 @@ describe("Root", () => {
         
         await waitFor(() => screen.getByText("ABC123"));
         
-        const logoutLink = screen.getByText("Logout");
+        const logoutLink = screen.getByText("\u9000\u51fa");
         expect(logoutLink).toBeInTheDocument();
         expect(logoutLink.closest("a")).toHaveAttribute("href", "/logout");
-        expect(logoutLink.closest("a")).toHaveClass("ml-2");
+        expect(logoutLink.closest("a")).toHaveClass("ml-1");
     });
 });
 

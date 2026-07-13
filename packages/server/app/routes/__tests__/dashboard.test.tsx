@@ -14,9 +14,9 @@ import { requireAuth } from "~/lib/auth";
 import "vitest-dom/extend-expect";
 
 import { createRoutesStub } from "react-router";
-import { render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 
-import Dashboard, { loader } from "../console.sites.$siteId.analytics";
+import Dashboard, { loader } from "../console.sites_.$siteId_.analytics";
 import { AnalyticsEngineAPI } from "~/analytics/query";
 import { createFetchResponse, getDefaultContext } from "./testutils";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
@@ -39,6 +39,7 @@ describe("Dashboard route", () => {
     });
 
     afterEach(() => {
+        cleanup();
         vi.restoreAllMocks();
     });
 
@@ -321,7 +322,7 @@ describe("Dashboard route", () => {
                     {
                         path: "/resources/timeseries",
                         loader: () => {
-                            return {};
+                            return { chartData: [], intervalType: "DAY" };
                         },
                     },
                     {
@@ -370,6 +371,24 @@ describe("Dashboard route", () => {
                                     ["United Kingdom", 60],
                                 ],
                             };
+                        },
+                    },
+                    {
+                        path: "/resources/region",
+                        loader: () => {
+                            return { countsByProperty: [["Ontario", 80]] };
+                        },
+                    },
+                    {
+                        path: "/resources/city",
+                        loader: () => {
+                            return { countsByProperty: [["Toronto", 80]] };
+                        },
+                    },
+                    {
+                        path: "/resources/geo",
+                        loader: () => {
+                            return { points: [] };
                         },
                     },
                     {
@@ -433,7 +452,7 @@ describe("Dashboard route", () => {
         });
 
         // assert some of the data we mocked actually rendered into the document
-        expect(screen.getByText("2.1K")).toBeInTheDocument(); // view count
+        expect(screen.getByText("2133")).toBeInTheDocument(); // view count
         expect(screen.getByText("33")).toBeInTheDocument(); // visitor count
 
         expect(screen.getByText("/about")).toBeInTheDocument();

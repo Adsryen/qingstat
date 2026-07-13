@@ -3,6 +3,7 @@ import { loader } from "../resources.stats";
 
 vi.mock("~/lib/auth", () => ({
     requireAuth: vi.fn(),
+    isAuthEnabled: vi.fn(() => false),
 }));
 
 describe("resources.stats loader", () => {

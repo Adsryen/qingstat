@@ -15,6 +15,7 @@ import { loader } from "../resources.paths";
 
 vi.mock("~/lib/auth", () => ({
     requireAuth: vi.fn(),
+    isAuthEnabled: vi.fn(() => false),
 }));
 
 describe("Resources/Paths route", () => {
