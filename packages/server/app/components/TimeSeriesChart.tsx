@@ -29,8 +29,18 @@ function dateStringToLocalDateObj(dateString: string): Date {
     return date;
 }
 
-function CustomTooltip(props: any) {
-    const { active, payload, label } = props;
+type TooltipPayload = Array<{ value?: number | string }>;
+
+function CustomTooltip({
+    active,
+    payload,
+    label,
+}: {
+    active?: boolean;
+    payload?: TooltipPayload;
+    label?: string;
+}) {
+    if (!active || !payload?.length || !label) return null;
 
     const date = dateStringToLocalDateObj(label);
 
@@ -41,27 +51,23 @@ function CustomTooltip(props: any) {
         minute: "numeric",
         timeZoneName: "short",
     });
-    if (active && payload && payload.length) {
-        return (
-            <Card className="p-2 shadow-lg leading-normal">
-                <div className="font-semibold">{formattedDate}</div>
-                <div className="before:content-['•'] before:text-border before:font-bold">
-                    {" "}
-                    {`${payload[1].value} visitors`}
+
+    return (
+        <Card className="rounded-xl border-border/70 p-3 shadow-lg leading-normal">
+            <div className="font-semibold">{formattedDate}</div>
+            <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+                <div className="before:content-['\2022'] before:text-chart-visitors before:font-bold before:mr-2">
+                    {`${payload[1]?.value ?? "—"} visitors`}
                 </div>
-                <div className="before:content-['•'] before:text-barchart before:font-bold">
-                    {" "}
-                    {`${payload[0].value} views`}
+                <div className="before:content-['\2022'] before:text-chart-views before:font-bold before:mr-2">
+                    {`${payload[0]?.value ?? "—"} views`}
                 </div>
-                <div className="before:content-['•'] before:text-paldarkgrey before:font-bold">
-                    {" "}
-                    {`${payload[2].value}% bounce rate`}
+                <div className="before:content-['\2022'] before:text-chart-bounce before:font-bold before:mr-2">
+                    {`${payload[2]?.value ?? "—"}% bounce rate`}
                 </div>
-            </Card>
-        );
-    } else {
-        return null;
-    }
+            </div>
+        </Card>
+    );
 }
 
 export default function TimeSeriesChart({
@@ -139,14 +145,21 @@ export default function TimeSeriesChart({
                     bottom: 0,
                 }}
             >
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="hsl(var(--border))"
+                    strokeOpacity={0.72}
+                />
                 <XAxis
                     dataKey="date"
                     // tickLine={false}
                     tickMargin={8}
                     ticks={xAxisTicks}
                     tickFormatter={xAxisDateFormatter}
-                    tick={{ fill: "grey", fontSize: 14 }}
+                    tick={{
+                        fill: "hsl(var(--muted-foreground))",
+                        fontSize: 12,
+                    }}
                 />
 
                 {/* manually setting maxViews vs using recharts "dataMax" key cause it doesnt seem to work */}
@@ -157,7 +170,10 @@ export default function TimeSeriesChart({
                     tickLine={false}
                     tickMargin={5}
                     ticks={yAxisCountTicks}
-                    tick={{ fill: "grey", fontSize: 14 }}
+                    tick={{
+                        fill: "hsl(var(--muted-foreground))",
+                        fontSize: 12,
+                    }}
                 />
                 <YAxis
                     yAxisId="bounceRate"
@@ -172,21 +188,23 @@ export default function TimeSeriesChart({
                 <Area
                     yAxisId="count"
                     dataKey="views"
-                    stroke="#F46A3D"
+                    stroke="hsl(var(--chart-views))"
                     strokeWidth="2"
-                    fill="#F99C35"
+                    fill="hsl(var(--chart-views))"
+                    fillOpacity={0.16}
                 />
                 <Area
                     yAxisId="count"
                     dataKey="visitors"
-                    stroke="#F46A3D"
+                    stroke="hsl(var(--chart-visitors))"
                     strokeWidth="2"
-                    fill="#f96d3e"
+                    fill="hsl(var(--chart-visitors))"
+                    fillOpacity={0.12}
                 />
                 <Line
                     yAxisId="bounceRate"
                     dataKey="bounceRate"
-                    stroke="#56726C"
+                    stroke="hsl(var(--chart-bounce))"
                     strokeWidth="2"
                     dot={false}
                 />

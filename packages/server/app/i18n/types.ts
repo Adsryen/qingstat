@@ -200,6 +200,22 @@ export type Messages = {
             empty: string;
             metricsLater: string;
             metricsLaterDesc: string;
+            metricsSnapshot: string;
+            metricsSnapshotDesc: string;
+            uniqueVisitorsHint: string;
+            pageviewsHint: string;
+            bounceHint: string;
+            trendEyebrow: string;
+            trendTitle: string;
+            trendDesc: string;
+            geoEyebrow: string;
+            liveEyebrow: string;
+            liveTitle: string;
+            liveDesc: string;
+            liveSite: string;
+            liveRange: string;
+            liveTimezone: string;
+            realtimeAction: string;
         };
         site: {
             consoleAnalytics: string;

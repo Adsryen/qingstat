@@ -47,6 +47,8 @@ import {
 } from "~/lib/utils";
 import { SearchFilters } from "~/lib/types";
 import SearchFilterBadges from "~/components/SearchFilterBadges";
+import { FilterBar } from "~/components/analytics/FilterBar";
+import { LivePulse } from "~/components/analytics/LivePulse";
 import { TimeSeriesCard } from "./resources.timeseries";
 import { StatsCard } from "./resources.stats";
 import { useLocale } from "~/i18n/LocaleContext";
@@ -218,19 +220,31 @@ export default function Dashboard() {
     const userTimezone = getUserTimezone();
 
     return (
-        <div className="space-y-4">
-            <div className="mb-2">
-                <h1 className="text-xl font-bold tracking-tight text-foreground">
+        <div className="space-y-5">
+            <div className="space-y-2">
+                <h1 className="text-2xl font-semibold tracking-[-0.04em] text-foreground sm:text-3xl">
                     {t("home.dashboardTitle")}
                 </h1>
-                <p className="text-sm text-muted-foreground">
+                <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
                     {t("home.dashboardHint")}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-muted-foreground">
                     {t("dashboard.delayHint")}
                 </p>
             </div>
-            <div className="w-full mb-2 flex gap-4 flex-wrap items-center">
+            <LivePulse
+                eyebrow={t("console.overview.liveEyebrow")}
+                title={t("console.overview.liveTitle")}
+                description={t("console.overview.liveDesc")}
+                actionHref={!data.isPublicView && data.siteId ? `/console/sites/${encodeURIComponent(data.siteId)}/realtime` : undefined}
+                actionLabel={t("console.overview.realtimeAction")}
+                items={[
+                    { label: t("console.overview.liveSite"), value: data.siteId || t("dashboard.unknownSite") },
+                    { label: t("console.overview.liveRange"), value: data.interval },
+                    { label: t("console.overview.liveTimezone"), value: userTimezone },
+                ]}
+            />
+            <FilterBar>
                 <div className="lg:basis-1/5-gap-4 sm:basis-1/4-gap-4 basis-1/2-gap-4">
                     <Select
                         key={`site-${data.siteId}`}
@@ -294,7 +308,7 @@ export default function Dashboard() {
                         />
                     </div>
                 </div>
-            </div>
+            </FilterBar>
 
             <div className="transition" style={{ opacity: loading ? 0.6 : 1 }}>
                 <div className="w-full mb-4">

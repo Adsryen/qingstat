@@ -6,9 +6,10 @@ import {
 } from "~/lib/utils";
 import { useEffect } from "react";
 import { useFetcher } from "react-router";
-import { Card } from "~/components/ui/card";
 import { SearchFilters } from "~/lib/types";
 import { useLocale } from "~/i18n/LocaleContext";
+import { ChartShell } from "~/components/analytics/ChartShell";
+import { MetricTile } from "~/components/analytics/MetricTile";
 import { assertCanViewSiteStats } from "~/lib/siteAccess";
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
@@ -86,41 +87,45 @@ export const StatsCard = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [siteId, interval, filters, timezone]);
 
-    return (
-        <Card className="rounded-2xl shadow-sm overflow-hidden">
-            <div className="p-4 pl-6 sm:p-6">
-                <div className="grid grid-cols-3 gap-6 sm:gap-10 items-end">
-                    <div>
-                        <div className="text-sm sm:text-base text-muted-foreground">
-                            {t("metrics.uv")}
-                        </div>
-                        <div className="text-3xl sm:text-4xl font-semibold tabular-nums tracking-tight">
-                            {visitors ? countFormatter.format(visitors) : "—"}
-                        </div>
-                    </div>
+    const loading = dataFetcher.state !== "idle" && !dataFetcher.data;
 
-                    <div>
-                        <div className="text-sm sm:text-base text-muted-foreground">
-                            {t("metrics.pv")}
-                        </div>
-                        <div className="text-3xl sm:text-4xl font-semibold tabular-nums tracking-tight">
-                            {views ? countFormatter.format(views) : "—"}
-                        </div>
-                    </div>
-                    <div>
-                        <div className="text-sm sm:text-base text-muted-foreground">
-                            {t("metrics.bounce")}
-                        </div>
-                        <div className="text-3xl sm:text-4xl font-semibold tabular-nums tracking-tight">
-                            {hasSufficientBounceData
-                                ? bounceRate !== undefined
-                                    ? `${Math.round(bounceRate * 100)}%`
-                                    : "—"
-                                : "n/a"}
-                        </div>
-                    </div>
-                </div>
+    return (
+        <ChartShell
+            eyebrow={t("console.overview.last7d")}
+            title={t("console.overview.metricsSnapshot")}
+            description={t("console.overview.metricsSnapshotDesc")}
+            loading={dataFetcher.state !== "idle"}
+            contentClassName="p-4 sm:p-5"
+        >
+            <div className="grid gap-3 md:grid-cols-3">
+                <MetricTile
+                    label={t("metrics.uv")}
+                    value={visitors ? countFormatter.format(visitors) : "—"}
+                    hint={t("console.overview.uniqueVisitorsHint")}
+                    tone="live"
+                    loading={loading}
+                />
+                <MetricTile
+                    label={t("metrics.pv")}
+                    value={views ? countFormatter.format(views) : "—"}
+                    hint={t("console.overview.pageviewsHint")}
+                    tone="primary"
+                    loading={loading}
+                />
+                <MetricTile
+                    label={t("metrics.bounce")}
+                    value={
+                        hasSufficientBounceData
+                            ? bounceRate !== undefined
+                                ? `${Math.round(bounceRate * 100)}%`
+                                : "—"
+                            : "n/a"
+                    }
+                    hint={t("console.overview.bounceHint")}
+                    tone="heat"
+                    loading={loading}
+                />
             </div>
-        </Card>
+        </ChartShell>
     );
 };

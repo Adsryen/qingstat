@@ -7,11 +7,12 @@ import {
 } from "~/lib/utils";
 import { useEffect } from "react";
 import { useFetcher } from "react-router";
-import { Card, CardContent } from "~/components/ui/card";
 import TimeSeriesChart from "~/components/TimeSeriesChart";
 import { SearchFilters } from "~/lib/types";
 import type { ViewsGroupedByInterval } from "~/analytics/query";
 import { assertCanViewSiteStats } from "~/lib/siteAccess";
+import { ChartShell } from "~/components/analytics/ChartShell";
+import { useLocale } from "~/i18n/LocaleContext";
 
 export async function loader({
     context,
@@ -102,18 +103,24 @@ export const TimeSeriesCard = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [siteId, interval, filters, timezone]);
 
+    const { t } = useLocale();
+
     return (
-        <Card>
-            <CardContent>
-                <div className="h-72 pt-6 -m-4 -mr-10 -ml-10 sm:-m-2 sm:-ml-6 sm:-mr-6">
-                    {chartData && (
-                        <TimeSeriesChart
-                            data={chartData}
-                            intervalType={intervalType}
-                        />
-                    )}
-                </div>
-            </CardContent>
-        </Card>
+        <ChartShell
+            eyebrow={t("console.overview.trendEyebrow")}
+            title={t("console.overview.trendTitle")}
+            description={t("console.overview.trendDesc")}
+            loading={dataFetcher.state !== "idle"}
+            contentClassName="overflow-hidden p-0"
+        >
+            <div className="h-80 px-1 py-5 pr-8 sm:px-3 sm:pr-10">
+                {chartData && (
+                    <TimeSeriesChart
+                        data={chartData}
+                        intervalType={intervalType}
+                    />
+                )}
+            </div>
+        </ChartShell>
     );
 };

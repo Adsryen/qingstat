@@ -8,16 +8,27 @@ import {
     TableRow,
 } from "~/components/ui/table";
 
-type CountByProperty = [string, string, string?][];
+export type CountByPropertyLabel = string | [key: string, label: string];
+export type CountByPropertyValue = string | number;
+export type CountByPropertyRow = [
+    label: CountByPropertyLabel,
+    count: CountByPropertyValue,
+    secondaryCount?: CountByPropertyValue,
+];
+export type CountByProperty = CountByPropertyRow[];
 
 function calculateCountPercentages(countByProperty: CountByProperty) {
     const totalCount = countByProperty.reduce(
-        (sum, row) => sum + parseInt(row[1]),
+        (sum, row) => sum + Number(row[1]),
         0,
     );
 
     return countByProperty.map((row) => {
-        const count = parseInt(row[1]);
+        const count = Number(row[1]);
+        if (totalCount <= 0) {
+            return "0%";
+        }
+
         const percentage = ((count / totalCount) * 100).toFixed(2);
         return `${percentage}%`;
     });
@@ -43,16 +54,16 @@ export default function TableCard({
             : "grid-cols-[minmax(0,1fr),minmax(0,8ch)]";
 
     return (
-        <Table>
+        <Table className="overflow-hidden">
             <TableHeader>
-                <TableRow className={`${gridCols}`}>
+                <TableRow className={`${gridCols} bg-muted/25`}>
                     {(columnHeaders || []).map((header: string, index) => (
                         <TableHead
                             key={header}
                             className={
                                 index === 0
-                                    ? "text-left"
-                                    : "text-right pr-4 pl-0"
+                                    ? "text-left text-xs uppercase tracking-[0.14em]"
+                                    : "text-right pr-4 pl-0 text-xs uppercase tracking-[0.14em]"
                             }
                         >
                             {header}
@@ -78,7 +89,7 @@ export default function TableCard({
                     return (
                         <TableRow
                             key={key}
-                            className={`group [&_td]:last:rounded-b-md ${gridCols}`}
+                            className={`group border-border/50 transition-colors hover:bg-muted/30 [&_td]:last:rounded-b-md ${gridCols}`}
                             width={barChartPercentages[index]}
                         >
                             <TableCell className="overflow-hidden font-medium min-w-48 whitespace-normal relative flex items-center justify-start gap-2">
@@ -100,7 +111,7 @@ export default function TableCard({
                                                 onClick={() =>
                                                     onClick(key as string)
                                                 }
-                                                className="hover:underline select-text text-left truncate"
+                                                className="hover:underline select-text text-left truncate decoration-live/60 underline-offset-4"
                                             >
                                                 {formattedLabel}
                                             </button>
@@ -112,7 +123,7 @@ export default function TableCard({
                                             target={"_blank"}
                                             rel="noreferrer"
                                             aria-hidden="true"
-                                            className="inline whitespace-nowrap ml-1"
+                                            className="inline whitespace-nowrap ml-1 text-muted-foreground transition-colors group-hover:text-live"
                                         >
                                             <ExternalLink size={16} />
                                         </a>
@@ -124,7 +135,7 @@ export default function TableCard({
                                                 onClick={() =>
                                                     onClick(key as string)
                                                 }
-                                                className="hover:underline select-text text-left truncate"
+                                                className="hover:underline select-text text-left truncate decoration-live/60 underline-offset-4"
                                             >
                                                 {formattedLabel}
                                             </button>
@@ -135,15 +146,13 @@ export default function TableCard({
                                 )}
                             </TableCell>
 
-                            <TableCell className="text-right min-w-16">
-                                {countFormatter.format(parseInt(item[1], 10))}
+                            <TableCell className="text-right min-w-16 tabular-nums font-medium">
+                                {countFormatter.format(Number(item[1]))}
                             </TableCell>
 
                             {item.length > 2 && item[2] !== undefined && (
-                                <TableCell className="text-right min-w-16">
-                                    {countFormatter.format(
-                                        parseInt(item[2], 10),
-                                    )}
+                                <TableCell className="text-right min-w-16 tabular-nums font-medium">
+                                    {countFormatter.format(Number(item[2]))}
                                 </TableCell>
                             )}
                         </TableRow>

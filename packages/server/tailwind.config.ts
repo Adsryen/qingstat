@@ -32,6 +32,27 @@ export default {
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
                 barchart: "hsl(var(--barchart))",
+                live: {
+                    DEFAULT: "hsl(var(--live))",
+                    foreground: "hsl(var(--live-foreground))",
+                },
+                heat: {
+                    DEFAULT: "hsl(var(--heat))",
+                    foreground: "hsl(var(--heat-foreground))",
+                },
+                success: {
+                    DEFAULT: "hsl(var(--success))",
+                    foreground: "hsl(var(--success-foreground))",
+                },
+                warning: {
+                    DEFAULT: "hsl(var(--warning))",
+                    foreground: "hsl(var(--warning-foreground))",
+                },
+                chart: {
+                    views: "hsl(var(--chart-views))",
+                    visitors: "hsl(var(--chart-visitors))",
+                    bounce: "hsl(var(--chart-bounce))",
+                },
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
 

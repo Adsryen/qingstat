@@ -1,14 +1,19 @@
 import { useEffect, useState } from "react";
-import TableCard from "~/components/TableCard";
+import type { FetcherWithComponents } from "react-router";
+import TableCard, { type CountByProperty } from "~/components/TableCard";
 
 import { Card } from "./ui/card";
 import PaginationButtons from "./PaginationButtons";
 import { SearchFilters } from "~/lib/types";
 
+type PaginatedFetcherData = {
+    countsByProperty?: CountByProperty;
+};
+
 interface PaginatedTableCardProps {
     siteId: string;
     interval: string;
-    dataFetcher: any;
+    dataFetcher: FetcherWithComponents<PaginatedFetcherData>;
     columnHeaders: string[];
     filters?: SearchFilters;
     loaderUrl: string;
@@ -32,13 +37,21 @@ const PaginatedTableCard = ({
     const [page, setPage] = useState(1);
 
     useEffect(() => {
-        const params = {
+        const params = new URLSearchParams({
             site: siteId,
             interval,
-            timezone,
-            ...filters,
-            page,
-        };
+            page: String(page),
+        });
+
+        if (timezone) {
+            params.set("timezone", timezone);
+        }
+
+        Object.entries(filters ?? {}).forEach(([key, value]) => {
+            if (value !== undefined) {
+                params.set(key, value);
+            }
+        });
 
         dataFetcher.submit(params, {
             method: "get",
@@ -54,9 +67,15 @@ const PaginatedTableCard = ({
 
     const hasMore = countsByProperty.length === 10;
     return (
-        <Card className={dataFetcher.state === "loading" ? "opacity-60" : ""}>
+        <Card
+            className={
+                dataFetcher.state === "loading"
+                    ? "overflow-hidden rounded-[1.35rem] border-border/70 opacity-60 shadow-sm"
+                    : "overflow-hidden rounded-[1.35rem] border-border/70 shadow-sm"
+            }
+        >
             {countsByProperty ? (
-                <div className="grid grid-rows-[auto,40px] h-full">
+                <div className="grid h-full grid-rows-[auto,40px]">
                     <TableCard
                         countByProperty={countsByProperty}
                         columnHeaders={columnHeaders}
