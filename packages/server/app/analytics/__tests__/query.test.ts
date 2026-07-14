@@ -658,6 +658,132 @@ describe("AnalyticsEngineAPI", () => {
             ]);
         });
     });
+
+    describe("getTrafficSourceSummary", () => {
+        test("folds referrer and UTM combinations into mutually-exclusive source totals", async () => {
+            fetch.mockResolvedValue(
+                createFetchResponse({
+                    data: [
+                        {
+                            referrer: "https://www.google.com/search?q=stats",
+                            utmSource: "google",
+                            utmMedium: "cpc",
+                            utmCampaign: "launch",
+                            utmTerm: "",
+                            utmContent: "",
+                            isVisitor: 1,
+                            isBounce: 0,
+                            count: 2,
+                        },
+                        {
+                            referrer: "https://www.google.com/search?q=stats",
+                            utmSource: "google",
+                            utmMedium: "cpc",
+                            utmCampaign: "launch",
+                            utmTerm: "",
+                            utmContent: "",
+                            isVisitor: 0,
+                            isBounce: 0,
+                            count: 3,
+                        },
+                        {
+                            referrer: "https://www.zhihu.com/question/1",
+                            utmSource: "",
+                            utmMedium: "",
+                            utmCampaign: "",
+                            utmTerm: "",
+                            utmContent: "",
+                            isVisitor: 1,
+                            isBounce: 0,
+                            count: 4,
+                        },
+                        {
+                            referrer: "https://example.org/post",
+                            utmSource: "",
+                            utmMedium: "",
+                            utmCampaign: "",
+                            utmTerm: "",
+                            utmContent: "",
+                            isVisitor: 0,
+                            isBounce: 0,
+                            count: 6,
+                        },
+                        {
+                            referrer: "",
+                            utmSource: "",
+                            utmMedium: "",
+                            utmCampaign: "",
+                            utmTerm: "",
+                            utmContent: "",
+                            isVisitor: 1,
+                            isBounce: 0,
+                            count: 1,
+                        },
+                    ],
+                }),
+            );
+
+            const result = await api.getTrafficSourceSummary(
+                "example.com",
+                "7d",
+                "UTC",
+            );
+            const body = fetch.mock.calls[0][1].body as string;
+
+            expect(body).toContain("blob5 as referrer");
+            expect(body).toContain("blob11 as utmSource");
+            expect(body).toContain("blob12 as utmMedium");
+            expect(body).toContain("SUM(_sample_interval) as count");
+            expect(result).toEqual([
+                ["social", 4, 4],
+                ["ads", 2, 5],
+                ["direct", 1, 1],
+                ["external", 0, 6],
+            ]);
+        });
+
+        test("applies sourceType as a derived filter outside Analytics Engine SQL", async () => {
+            fetch.mockResolvedValue(
+                createFetchResponse({
+                    data: [
+                        {
+                            referrer: "https://www.baidu.com/s?wd=stats",
+                            utmSource: "",
+                            utmMedium: "",
+                            utmCampaign: "",
+                            utmTerm: "",
+                            utmContent: "",
+                            isVisitor: 1,
+                            isBounce: 0,
+                            count: 2,
+                        },
+                        {
+                            referrer: "https://example.org/post",
+                            utmSource: "",
+                            utmMedium: "",
+                            utmCampaign: "",
+                            utmTerm: "",
+                            utmContent: "",
+                            isVisitor: 1,
+                            isBounce: 0,
+                            count: 5,
+                        },
+                    ],
+                }),
+            );
+
+            const result = await api.getTrafficSourceSummary(
+                "example.com",
+                "7d",
+                "UTC",
+                { sourceType: "search" },
+            );
+            const body = fetch.mock.calls[0][1].body as string;
+
+            expect(body).not.toContain("sourceType");
+            expect(result).toEqual([["search", 2, 2]]);
+        });
+    });
 });
 
 describe("intervalToSql", () => {

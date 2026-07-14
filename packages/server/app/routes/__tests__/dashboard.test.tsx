@@ -204,6 +204,12 @@ describe("Dashboard route", () => {
                         },
                     },
                     {
+                        path: "/resources/source-taxonomy",
+                        loader: () => {
+                            return { countsByProperty: [] };
+                        },
+                    },
+                    {
                         path: "/resources/browser",
                         loader: () => {
                             return { countsByProperty: [] };
@@ -284,6 +290,7 @@ describe("Dashboard route", () => {
         await waitFor(() => screen.findByText("Path"));
         expect(screen.getByText("Path")).toBeInTheDocument();
         expect(screen.getByText("Referrer")).toBeInTheDocument();
+        expect(screen.getByText("Source Type")).toBeInTheDocument();
         expect(screen.getByText("Browser")).toBeInTheDocument();
         expect(screen.getByText("Country")).toBeInTheDocument();
         expect(screen.getByText("Device")).toBeInTheDocument();
@@ -364,6 +371,14 @@ describe("Dashboard route", () => {
                                     ["facebook.com", 80],
                                     ["twitter.com", 60],
                                 ],
+                            };
+                        },
+                    },
+                    {
+                        path: "/resources/source-taxonomy",
+                        loader: () => {
+                            return {
+                                countsByProperty: [["search", 42, 50]],
                             };
                         },
                     },

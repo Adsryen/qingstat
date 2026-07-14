@@ -1,6 +1,9 @@
+import type { TrafficSourceType } from "~/analytics/source-taxonomy";
+
 export interface SearchFilters {
     path?: string;
     referrer?: string;
+    sourceType?: TrafficSourceType;
     deviceModel?: string;
     deviceType?: string;
     country?: string;

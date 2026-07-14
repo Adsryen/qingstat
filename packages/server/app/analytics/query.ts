@@ -1,4 +1,9 @@
 import { ColumnMappingToType, ColumnMappings } from "./schema";
+import {
+    classifyTrafficSource,
+    TRAFFIC_SOURCE_TYPES,
+    type TrafficSourceType,
+} from "./source-taxonomy";
 
 import { SearchFilters } from "~/lib/types";
 
@@ -24,6 +29,11 @@ export interface AnalyticsCountResult {
 }
 
 export type ViewsGroupedByInterval = [string, AnalyticsCountResult][];
+export type TrafficSourceSummaryRow = [
+    sourceType: TrafficSourceType,
+    visitors: number,
+    views: number,
+];
 /** Given an AnalyticsCountResult object, and an object representing a row returned from
  *  CF Analytics Engine w/ counts grouped by isVisitor, accumulate view,
  *  visit, and visitor counts.
@@ -132,7 +142,11 @@ function generateEmptyRowsOverInterval(
 }
 
 function filtersToSql(filters: SearchFilters) {
-    const supportedFilters: Array<keyof SearchFilters> = [
+    type ColumnFilterKey = Extract<
+        keyof SearchFilters,
+        keyof typeof ColumnMappings
+    >;
+    const supportedFilters: ColumnFilterKey[] = [
         "path",
         "referrer",
         "browserName",
@@ -1165,5 +1179,101 @@ export class AnalyticsEngineAPI {
         });
 
         return returnPromise;
+    }
+
+    async getTrafficSourceSummary(
+        siteId: string,
+        interval: string,
+        tz?: string,
+        filters: SearchFilters = {},
+    ): Promise<TrafficSourceSummaryRow[]> {
+        const { startIntervalSql, endIntervalSql } = intervalToSql(
+            interval,
+            tz,
+        );
+        const { sourceType, ...columnFilters } = filters;
+        const filterStr = filtersToSql(columnFilters);
+
+        const query = `
+            SELECT
+                ${ColumnMappings.referrer} as referrer,
+                ${ColumnMappings.utmSource} as utmSource,
+                ${ColumnMappings.utmMedium} as utmMedium,
+                ${ColumnMappings.utmCampaign} as utmCampaign,
+                ${ColumnMappings.utmTerm} as utmTerm,
+                ${ColumnMappings.utmContent} as utmContent,
+                ${ColumnMappings.newVisitor} as isVisitor,
+                ${ColumnMappings.bounce} as isBounce,
+                SUM(_sample_interval) as count
+            FROM metricsDataset
+            WHERE timestamp >= ${startIntervalSql} AND timestamp < ${endIntervalSql}
+                AND ${ColumnMappings.siteId} = '${siteId}'
+                ${filterStr}
+            GROUP BY
+                ${ColumnMappings.referrer},
+                ${ColumnMappings.utmSource},
+                ${ColumnMappings.utmMedium},
+                ${ColumnMappings.utmCampaign},
+                ${ColumnMappings.utmTerm},
+                ${ColumnMappings.utmContent},
+                ${ColumnMappings.newVisitor},
+                ${ColumnMappings.bounce}
+            ORDER BY count DESC`;
+
+        type SelectionSet = {
+            referrer: string;
+            utmSource: string;
+            utmMedium: string;
+            utmCampaign: string;
+            utmTerm: string;
+            utmContent: string;
+            isVisitor: number;
+            isBounce: number;
+            count: number;
+        };
+
+        const response = await this.query(query);
+
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        const responseData =
+            (await response.json()) as AnalyticsQueryResult<SelectionSet>;
+        const countsBySource = new Map<TrafficSourceType, AnalyticsCountResult>();
+
+        responseData.data.forEach((row) => {
+            const rowSourceType = classifyTrafficSource(row);
+            if (sourceType && rowSourceType !== sourceType) {
+                return;
+            }
+
+            const counts = countsBySource.get(rowSourceType) || {
+                views: 0,
+                visitors: 0,
+                bounces: 0,
+            };
+
+            accumulateCountsFromRowResult(counts, row);
+            countsBySource.set(rowSourceType, counts);
+        });
+
+        return Array.from(countsBySource.entries())
+            .sort((a, b) => {
+                const visitorDelta = b[1].visitors - a[1].visitors;
+                if (visitorDelta !== 0) {
+                    return visitorDelta;
+                }
+
+                return (
+                    TRAFFIC_SOURCE_TYPES.indexOf(a[0]) -
+                    TRAFFIC_SOURCE_TYPES.indexOf(b[0])
+                );
+            })
+            .map(([sourceType, counts]) => [
+                sourceType,
+                counts.visitors,
+                counts.views,
+            ]);
     }
 }

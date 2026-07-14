@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { SearchFilters } from "./types";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -20,22 +21,6 @@ export function paramsFromUrl(url: string) {
     return params;
 }
 
-interface SearchFilters {
-    path?: string;
-    referrer?: string;
-    deviceType?: string;
-    country?: string;
-    region?: string;
-    city?: string;
-    browserName?: string;
-    browserVersion?: string;
-    utmSource?: string;
-    utmMedium?: string;
-    utmCampaign?: string;
-    utmTerm?: string;
-    utmContent?: string;
-}
-
 export function getFiltersFromSearchParams(searchParams: URLSearchParams) {
     const filters: SearchFilters = {};
 
@@ -44,6 +29,11 @@ export function getFiltersFromSearchParams(searchParams: URLSearchParams) {
     }
     if (searchParams.has("referrer")) {
         filters.referrer = searchParams.get("referrer") || "";
+    }
+    if (searchParams.has("sourceType")) {
+        filters.sourceType = searchParams.get(
+            "sourceType",
+        ) as SearchFilters["sourceType"];
     }
     if (searchParams.has("deviceType")) {
         filters.deviceType = searchParams.get("deviceType") || "";

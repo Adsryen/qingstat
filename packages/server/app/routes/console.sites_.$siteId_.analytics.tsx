@@ -26,6 +26,7 @@ import {
 } from "react-router";
 
 import { ReferrerCard } from "./resources.referrer";
+import { SourceTaxonomyCard } from "./resources.source-taxonomy";
 import { PathsCard } from "./resources.paths";
 import { BrowserCard } from "./resources.browser";
 import { BrowserVersionCard } from "./resources.browserversion";
@@ -305,8 +306,15 @@ export default function Dashboard() {
                         timezone={userTimezone}
                     />
                 </div>
-                <div className="grid md:grid-cols-2 gap-4 mb-4">
+                <div className="grid md:grid-cols-3 gap-4 mb-4">
                     <PathsCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        onFilterChange={handleFilterChange}
+                        timezone={userTimezone}
+                    />
+                    <SourceTaxonomyCard
                         siteId={data.siteId}
                         interval={data.interval}
                         filters={data.filters}
