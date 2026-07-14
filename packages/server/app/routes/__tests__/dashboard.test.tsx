@@ -210,6 +210,18 @@ describe("Dashboard route", () => {
                         },
                     },
                     {
+                        path: "/resources/entry-pages",
+                        loader: () => {
+                            return { countsByProperty: [] };
+                        },
+                    },
+                    {
+                        path: "/resources/exit-pages",
+                        loader: () => {
+                            return { countsByProperty: [] };
+                        },
+                    },
+                    {
                         path: "/resources/browser",
                         loader: () => {
                             return { countsByProperty: [] };
@@ -291,6 +303,8 @@ describe("Dashboard route", () => {
         expect(screen.getByText("Path")).toBeInTheDocument();
         expect(screen.getByText("Referrer")).toBeInTheDocument();
         expect(screen.getByText("Source Type")).toBeInTheDocument();
+        expect(screen.getByText("Entry Page")).toBeInTheDocument();
+        expect(screen.getByText("Exit Page")).toBeInTheDocument();
         expect(screen.getByText("Browser")).toBeInTheDocument();
         expect(screen.getByText("Country")).toBeInTheDocument();
         expect(screen.getByText("Device")).toBeInTheDocument();
@@ -380,6 +394,18 @@ describe("Dashboard route", () => {
                             return {
                                 countsByProperty: [["search", 42, 50]],
                             };
+                        },
+                    },
+                    {
+                        path: "/resources/entry-pages",
+                        loader: () => {
+                            return { countsByProperty: [["/home", 10, 10]] };
+                        },
+                    },
+                    {
+                        path: "/resources/exit-pages",
+                        loader: () => {
+                            return { countsByProperty: [["/pricing", 8, 8]] };
                         },
                     },
                     {

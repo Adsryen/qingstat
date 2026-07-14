@@ -27,6 +27,8 @@ import {
 
 import { ReferrerCard } from "./resources.referrer";
 import { SourceTaxonomyCard } from "./resources.source-taxonomy";
+import { EntryPagesCard } from "./resources.entry-pages";
+import { ExitPagesCard } from "./resources.exit-pages";
 import { PathsCard } from "./resources.paths";
 import { BrowserCard } from "./resources.browser";
 import { BrowserVersionCard } from "./resources.browserversion";
@@ -322,6 +324,22 @@ export default function Dashboard() {
                         timezone={userTimezone}
                     />
                     <ReferrerCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        onFilterChange={handleFilterChange}
+                        timezone={userTimezone}
+                    />
+                </div>
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
+                    <EntryPagesCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        onFilterChange={handleFilterChange}
+                        timezone={userTimezone}
+                    />
+                    <ExitPagesCard
                         siteId={data.siteId}
                         interval={data.interval}
                         filters={data.filters}
