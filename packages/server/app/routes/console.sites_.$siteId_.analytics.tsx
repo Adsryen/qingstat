@@ -54,6 +54,7 @@ import { FilterBar } from "~/components/analytics/FilterBar";
 import { LivePulse } from "~/components/analytics/LivePulse";
 import { TimeSeriesCard } from "./resources.timeseries";
 import { StatsCard } from "./resources.stats";
+import { NewReturningCard } from "./resources.new-returning";
 import { requireAuth } from "~/lib/auth";
 import { useLocale } from "~/i18n/LocaleContext";
 
@@ -286,6 +287,14 @@ export default function Dashboard() {
             <div className="transition" style={{ opacity: loading ? 0.6 : 1 }}>
                 <div className="w-full mb-4">
                     <StatsCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        timezone={userTimezone}
+                    />
+                </div>
+                <div className="w-full mb-4">
+                    <NewReturningCard
                         siteId={data.siteId}
                         interval={data.interval}
                         filters={data.filters}

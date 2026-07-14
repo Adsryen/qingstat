@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+﻿// @vitest-environment jsdom
 import type { LoaderFunctionArgs } from "react-router";
 import {
     vi,
@@ -192,6 +192,26 @@ describe("Dashboard route", () => {
                         },
                     },
                     {
+                        path: "/resources/new-returning",
+                        loader: () => {
+                            return {
+                                summary: {
+                                    available: false,
+                                    reason: "db-unavailable",
+                                    coverageStartedAt: null,
+                                    classifiedVisitors: 0,
+                                    newVisitors: 0,
+                                    returningVisitors: 0,
+                                    unclassifiedVisitors: 0,
+                                    newVisitorRate: null,
+                                    returningVisitorRate: null,
+                                    unsupportedFilters: [],
+                                    trend: [],
+                                },
+                            };
+                        },
+                    },
+                    {
                         path: "/resources/paths",
                         loader: () => {
                             return { countsByProperty: [] };
@@ -303,6 +323,7 @@ describe("Dashboard route", () => {
         expect(screen.getByText("Path")).toBeInTheDocument();
         expect(screen.getByText("Referrer")).toBeInTheDocument();
         expect(screen.getByText("Source Type")).toBeInTheDocument();
+        expect(screen.getByText("New / returning visitors")).toBeInTheDocument();
         expect(screen.getByText("Entry Page")).toBeInTheDocument();
         expect(screen.getByText("Exit Page")).toBeInTheDocument();
         expect(screen.getByText("Browser")).toBeInTheDocument();
@@ -362,6 +383,27 @@ describe("Dashboard route", () => {
                         path: "/resources/timeseries",
                         loader: () => {
                             return { chartData: [], intervalType: "DAY" };
+                        },
+                    },
+                    {
+                        path: "/resources/new-returning",
+                        loader: () => {
+                            return {
+                                summary: {
+                                    available: true,
+                                    reason: null,
+                                    coverageStartedAt:
+                                        "2026-07-13T09:00:00.000Z",
+                                    classifiedVisitors: 10,
+                                    newVisitors: 4,
+                                    returningVisitors: 6,
+                                    unclassifiedVisitors: 1,
+                                    newVisitorRate: 0.4,
+                                    returningVisitorRate: 0.6,
+                                    unsupportedFilters: [],
+                                    trend: [],
+                                },
+                            };
                         },
                     },
                     {
