@@ -14,8 +14,8 @@ import { useLocale } from "~/i18n/LocaleContext";
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "Qingstat: Login" },
-        { name: "description", content: "Sign in to Qingstat console" },
+        { title: "轻统计 · 登录" },
+        { name: "description", content: "登录轻统计控制台" },
     ];
 };
 
