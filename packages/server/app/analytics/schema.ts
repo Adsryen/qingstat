@@ -64,4 +64,7 @@ export const ColumnMappings = {
     // bucketed screen dimensions (CSS px); 0 means unknown / not provided
     screenWidth: "double6",
     screenHeight: "double7",
+
+    /** 1 = bot/spider UA, 0 = human or unknown (missing UA is 0) */
+    botScore: "double8",
 } as const;

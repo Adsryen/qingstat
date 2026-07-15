@@ -8,6 +8,7 @@ import {
     recordVisitAndPageview,
     visitExists,
 } from "~/lib/visit-details";
+import { botScoreFromUserAgent } from "./bot-filter";
 
 // Cookieless visitor/session tracking
 // Uses the approach described here: https://notes.normally.com/cookieless-unique-visitor-counts/
@@ -418,6 +419,7 @@ export async function collectRequestHandler(
         // bucketed screen resolution (CSS px); missing → 0
         screenWidth: bucketScreenDimension(params.sw),
         screenHeight: bucketScreenDimension(params.sh),
+        botScore: botScoreFromUserAgent(userAgent),
         identity: identityParams.identity,
     };
 
@@ -540,6 +542,8 @@ interface DataPoint {
     screenWidth?: number;
     /** Bucketed screen height (CSS px); 0 = unknown */
     screenHeight?: number;
+    /** 1 = bot, 0 = human/unknown */
+    botScore?: number;
 }
 
 // NOTE: Cloudflare Analytics Engine has limits on total number of bytes, number of fields, etc.
@@ -584,6 +588,8 @@ export function writeDataPoint(
             // 0 means unknown / not provided (old trackers omit sw/sh)
             data.screenWidth ?? 0,
             data.screenHeight ?? 0,
+            // 0 = human/unknown (missing UA), 1 = bot
+            data.botScore ?? 0,
         ],
     };
 

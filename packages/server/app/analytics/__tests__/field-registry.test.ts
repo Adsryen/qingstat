@@ -57,6 +57,8 @@ describe("metricsDataset v1 field registry", () => {
         expect(getMetricsV1FieldBySlot("double7")?.logicalName).toBe(
             "screenHeight",
         );
+        expect(getMetricsV1FieldBySlot("double8")?.status).toBe("used");
+        expect(getMetricsV1FieldBySlot("double8")?.logicalName).toBe("botScore");
     });
 
     test("documents legacy visitor/session/bounce semantics as non-reusable", () => {

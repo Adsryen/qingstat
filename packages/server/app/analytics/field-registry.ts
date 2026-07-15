@@ -365,10 +365,10 @@ export const METRICS_V1_BLOB_FIELDS = [
     }),
 ] as const;
 
-const reservedDoubleFields = Array.from({ length: 13 }, (_, index) =>
+const reservedDoubleFields = Array.from({ length: 12 }, (_, index) =>
     field({
-        slot: `double${index + 8}` as const,
-        logicalName: `reservedDouble${index + 8}`,
+        slot: `double${index + 9}` as const,
+        logicalName: `reservedDouble${index + 9}`,
         valueType: "number",
         status: "reserved",
         source: "reserved",
@@ -479,6 +479,21 @@ export const METRICS_V1_DOUBLE_FIELDS = [
         privacy: "derived",
         queryRole: "bucketed screen height (CSS px); paired with screenWidth",
         compatibility: "locked double7; 0 means unknown; never store raw non-bucketed values",
+        rollup: "never",
+    }),
+    field({
+        slot: ColumnMappings.botScore,
+        logicalName: "botScore",
+        valueType: "number",
+        status: "used",
+        source: "User-Agent bot pattern match (bot-filter.ts)",
+        cardinality: "numeric",
+        maxLength: null,
+        nullable: false,
+        privacy: "derived",
+        queryRole: "1 = bot, 0 = human/unknown; queries default exclude botScore=1",
+        compatibility:
+            "locked double8; missing historical rows treated as 0; empty UA is 0",
         rollup: "never",
     }),
     ...reservedDoubleFields,

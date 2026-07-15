@@ -15,6 +15,13 @@ export interface SearchFilters {
     browserLanguage?: string;
     /** Combined "WxH" label, e.g. "1920x1080"; parsed to double6/double7 equality. */
     screenResolution?: string;
+    /**
+     * Bot traffic visibility.
+     * - omitted / "exclude": hide bots (default for dashboard)
+     * - "include": all traffic
+     * - "only": bot traffic only
+     */
+    botTraffic?: "exclude" | "include" | "only";
     utmSource?: string;
     utmMedium?: string;
     utmCampaign?: string;

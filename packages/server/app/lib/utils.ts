@@ -62,6 +62,12 @@ export function getFiltersFromSearchParams(searchParams: URLSearchParams) {
     if (searchParams.has("screenResolution")) {
         filters.screenResolution = searchParams.get("screenResolution") || "";
     }
+    if (searchParams.has("botTraffic")) {
+        const v = searchParams.get("botTraffic") || "";
+        if (v === "exclude" || v === "include" || v === "only") {
+            filters.botTraffic = v;
+        }
+    }
     if (searchParams.has("utmSource")) {
         filters.utmSource = searchParams.get("utmSource") || "";
     }

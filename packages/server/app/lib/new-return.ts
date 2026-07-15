@@ -73,6 +73,7 @@ const UNSUPPORTED_FILTER_KEYS = [
     "osName",
     "browserLanguage",
     "screenResolution",
+    "botTraffic",
     "utmSource",
     "utmMedium",
     "utmCampaign",

@@ -237,6 +237,7 @@ describe("collectRequestHandler", () => {
                 -122.4194, // longitude
                 0, // screenWidth unknown
                 0, // screenHeight unknown
+                0, // botScore human
             ],
             indexes: [
                 "example", // site id is index
@@ -266,7 +267,8 @@ describe("collectRequestHandler", () => {
                 0,
                 0,
                 0, // screenWidth
-                0, // screenHeight
+                0, // screenHeight,
+                0, // botScore
             ],
         );
     });
@@ -299,7 +301,8 @@ describe("collectRequestHandler", () => {
                 0,
                 0,
                 0, // screenWidth
-                0, // screenHeight
+                0, // screenHeight,
+                0, // botScore
             ],
         );
     });
@@ -337,7 +340,8 @@ describe("collectRequestHandler", () => {
                 0,
                 0,
                 0, // screenWidth
-                0, // screenHeight
+                0, // screenHeight,
+                0, // botScore
             ],
         );
     });
@@ -370,7 +374,8 @@ describe("collectRequestHandler", () => {
                 0,
                 0,
                 0, // screenWidth
-                0, // screenHeight
+                0, // screenHeight,
+                0, // botScore
             ],
         );
     });
@@ -403,7 +408,8 @@ describe("collectRequestHandler", () => {
                 0,
                 0,
                 0, // screenWidth
-                0, // screenHeight
+                0, // screenHeight,
+                0, // botScore
             ],
         );
     });
@@ -444,7 +450,8 @@ describe("collectRequestHandler", () => {
                 0,
                 0,
                 0, // screenWidth
-                0, // screenHeight
+                0, // screenHeight,
+                0, // botScore
             ],
         );
     });
@@ -487,7 +494,8 @@ describe("collectRequestHandler", () => {
                 0,
                 0,
                 0, // screenWidth
-                0, // screenHeight
+                0, // screenHeight,
+                0, // botScore
             ],
         );
     });
@@ -586,7 +594,7 @@ describe("collectRequestHandler", () => {
         expect(writeDataPoint).toHaveBeenCalled();
         const datapoint = (writeDataPoint as Mock).mock.calls[0][0];
         expect(datapoint.blobs).toHaveLength(20);
-        expect(datapoint.doubles).toHaveLength(7);
+        expect(datapoint.doubles).toHaveLength(8);
         expect(datapoint.blobs).not.toContain("203.0.113.10");
         expect(datapoint.blobs).not.toContain("198.51.100.20");
     });
@@ -631,7 +639,7 @@ describe("collectRequestHandler", () => {
 
         const datapoint = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock.calls[0][0];
         expect(datapoint.blobs).toHaveLength(20);
-        expect(datapoint.doubles).toHaveLength(7);
+        expect(datapoint.doubles).toHaveLength(8);
         expect(datapoint.blobs).not.toContain("client-pv-123");
     });
 
@@ -752,9 +760,10 @@ describe("collectRequestHandler", () => {
 
         const doubles = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock
             .calls[0][0].doubles;
-        expect(doubles).toHaveLength(7);
+        expect(doubles).toHaveLength(8);
         expect(doubles[5]).toBe(1920); // screenWidth bucketed
         expect(doubles[6]).toBe(1080); // screenHeight bucketed
+        expect(doubles[7]).toBe(0); // botScore
     });
 
     test("missing or invalid sw/sh write 0 for screen doubles", async () => {
@@ -780,4 +789,38 @@ describe("collectRequestHandler", () => {
         expect(doubles[5]).toBe(0);
         expect(doubles[6]).toBe(0);
     });
+    test("marks known spider UA as botScore=1", async () => {
+        const env = {
+            WEB_COUNTER_AE: {
+                writeDataPoint: vi.fn(),
+            } as AnalyticsEngineDataset,
+        } as Env;
+
+        const request = httpMocks.createRequest(
+            // @ts-expect-error mock
+            generateRequestParams({
+                "user-agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+            }),
+        );
+        await collectRequestHandler(request as any, env);
+        const doubles = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock.calls[0][0].doubles;
+        expect(doubles).toHaveLength(8);
+        expect(doubles[7]).toBe(1);
+    });
+
+    test("empty user-agent is not treated as bot", async () => {
+        const env = {
+            WEB_COUNTER_AE: {
+                writeDataPoint: vi.fn(),
+            } as AnalyticsEngineDataset,
+        } as Env;
+        const request = httpMocks.createRequest(
+            // @ts-expect-error mock
+            generateRequestParams({}),
+        );
+        await collectRequestHandler(request as any, env);
+        const doubles = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock.calls[0][0].doubles;
+        expect(doubles[7]).toBe(0);
+    });
+
 });

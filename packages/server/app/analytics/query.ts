@@ -200,6 +200,15 @@ function filtersToSql(filters: SearchFilters) {
         }
     }
 
+    // Bot filter: default exclude bots. Missing historical botScore is treated as 0.
+    const botMode = filters.botTraffic ?? "exclude";
+    if (botMode === "exclude") {
+        filterStr += ` AND (${ColumnMappings.botScore} = 0 OR ${ColumnMappings.botScore} IS NULL)`;
+    } else if (botMode === "only") {
+        filterStr += ` AND ${ColumnMappings.botScore} = 1`;
+    }
+    // "include" → no extra clause
+
     return filterStr;
 }
 
