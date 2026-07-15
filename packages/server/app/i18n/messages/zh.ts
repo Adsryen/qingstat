@@ -275,9 +275,16 @@ export const zh: Messages = {
             lastSeen: "最近上报",
             health: {
                 active: "运行中",
+                stale: "长时间无上报",
                 waiting: "等待数据",
                 disabled: "已停用",
                 "metrics-unavailable": "指标不可用",
+            },
+            healthHint: {
+                install: "请安装埋点代码并刷新被统计站点",
+                "check-tracker": "检查埋点是否仍在加载，或站点是否停更",
+                "enable-site": "在名册中重新启用该站点",
+                metrics: "检查 CF_ACCOUNT_ID / CF_BEARER_TOKEN 与 Analytics Engine",
             },
             listSummary: "共 {total} 个（名册 {registry} · 流量发现 {discovered}）",
             emptyHint: "创建站点后，可获取代码并查看分析。",

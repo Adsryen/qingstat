@@ -2,6 +2,9 @@ import { describe, expect, test } from "vitest";
 import type { Site } from "../sites";
 import {
     buildMultisiteSummary,
+    INSTALL_HEALTH,
+    parseLastSeenMs,
+    statusFor,
     type MultisiteMetricInput,
 } from "../multisite-summary";
 
@@ -148,7 +151,74 @@ describe("buildMultisiteSummary", () => {
             visibleSiteIds: new Set(["public"]),
         });
 
-        expect(rows.map((r) => r.siteId)).toEqual(["public"]);
-        expect(rows.find((r) => r.siteId === "private")).toBeUndefined();
+        expect(rows).toHaveLength(1);
+        expect(rows[0].siteId).toBe("public");
+    });
+
+    test("marks sites stale when lastSeen is older than threshold", () => {
+        const now = new Date("2026-07-15T12:00:00.000Z");
+        const rows = buildMultisiteSummary({
+            registry: [site({ siteId: "old", name: "Old" })],
+            metrics: [
+                metric({
+                    siteId: "old",
+                    views: 10,
+                    visitors: 3,
+                    bounces: 1,
+                    lastSeenAt: "2026-07-01 00:00:00",
+                }),
+            ],
+            now,
+            staleAfterDays: INSTALL_HEALTH.staleAfterDays,
+        });
+
+        expect(rows[0]).toMatchObject({
+            status: "stale",
+            healthHint: "check-tracker",
+            lastSeenAt: "2026-07-01 00:00:00",
+        });
+        // registry updatedAt must not be used as lastSeen
+        expect(rows[0].lastSeenAt).not.toBe(rows[0].updatedAt);
+    });
+
+    test("statusFor uses lastSeen age, not registry timestamps", () => {
+        const nowMs = Date.parse("2026-07-15T12:00:00.000Z");
+        expect(
+            statusFor({
+                enabled: true,
+                metricsUnavailable: false,
+                views: 5,
+                lastSeenAt: "2026-07-15 10:00:00",
+                nowMs,
+                staleAfterDays: 7,
+            }),
+        ).toBe("active");
+        expect(
+            statusFor({
+                enabled: true,
+                metricsUnavailable: false,
+                views: 5,
+                lastSeenAt: "2026-06-01 00:00:00",
+                nowMs,
+                staleAfterDays: 7,
+            }),
+        ).toBe("stale");
+        expect(
+            statusFor({
+                enabled: true,
+                metricsUnavailable: false,
+                views: 0,
+                lastSeenAt: null,
+                nowMs,
+                staleAfterDays: 7,
+            }),
+        ).toBe("waiting");
+    });
+
+    test("parseLastSeenMs accepts AE space-separated timestamps", () => {
+        expect(parseLastSeenMs("2026-07-14 02:00:00")).toBe(
+            Date.parse("2026-07-14T02:00:00.000Z"),
+        );
+        expect(parseLastSeenMs(null)).toBeNull();
     });
 });

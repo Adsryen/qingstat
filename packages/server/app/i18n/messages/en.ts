@@ -282,9 +282,16 @@ export const en: Messages = {
             lastSeen: "Last report",
             health: {
                 active: "Active",
+                stale: "No recent reports",
                 waiting: "Waiting for data",
                 disabled: "Disabled",
                 "metrics-unavailable": "Metrics unavailable",
+            },
+            healthHint: {
+                install: "Install the tracker snippet and refresh the tracked site",
+                "check-tracker": "Verify the tracker still loads, or the site stopped updating",
+                "enable-site": "Re-enable this site in the registry",
+                metrics: "Check CF_ACCOUNT_ID / CF_BEARER_TOKEN and Analytics Engine",
             },
             listSummary: "{total} total ({registry} registry · {discovered} discovered)",
             emptyHint: "After creating a site, get the code and open analytics.",

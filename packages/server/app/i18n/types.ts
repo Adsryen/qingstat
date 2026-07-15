@@ -269,9 +269,16 @@ export type Messages = {
             lastSeen: string;
             health: {
                 active: string;
+                stale: string;
                 waiting: string;
                 disabled: string;
                 "metrics-unavailable": string;
+            };
+            healthHint: {
+                install: string;
+                "check-tracker": string;
+                "enable-site": string;
+                metrics: string;
             };
             listSummary: string;
             emptyHint: string;

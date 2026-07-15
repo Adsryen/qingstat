@@ -130,7 +130,9 @@ function HealthStatus({ site }: { site: SiteListItem }) {
               ? "border-border bg-muted/50 text-muted-foreground"
               : site.status === "metrics-unavailable"
                 ? "border-red-300 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200"
-                : "border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200";
+                : site.status === "stale"
+                  ? "border-orange-300 bg-orange-50 text-orange-900 dark:border-orange-900 dark:bg-orange-950/40 dark:text-orange-200"
+                  : "border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200";
 
     return (
         <div className="space-y-1.5">
@@ -145,6 +147,11 @@ function HealthStatus({ site }: { site: SiteListItem }) {
             <div className="text-xs text-muted-foreground">
                 {t("console.site.lastSeen")}: {formatLastSeen(site.lastSeenAt)}
             </div>
+            {site.healthHint ? (
+                <div className="text-xs text-muted-foreground leading-snug">
+                    {t(`console.site.healthHint.${site.healthHint}`)}
+                </div>
+            ) : null}
         </div>
     );
 }
