@@ -478,6 +478,14 @@ describe("Dashboard route", () => {
                         },
                     },
                     {
+                        path: "/resources/path-exit-rate",
+                        loader: () => {
+                            return {
+                                countsByProperty: [["/pricing", 8, "100.0%"]],
+                            };
+                        },
+                    },
+                    {
                         path: "/resources/browser",
                         loader: () => {
                             return {
