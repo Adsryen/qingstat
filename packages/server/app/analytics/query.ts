@@ -1,7 +1,11 @@
 import { ColumnMappingToType, ColumnMappings } from "./schema";
 import {
     classifyTrafficSource,
+    extractSearchTerm,
+    identifySearchEngine,
+    SEARCH_TERM_NOT_PROVIDED,
     TRAFFIC_SOURCE_TYPES,
+    type SearchEngineId,
     type TrafficSourceType,
 } from "./source-taxonomy";
 
@@ -38,6 +42,23 @@ export type TrafficSourceSummaryRow = [
     visitors: number,
     views: number,
 ];
+export type SearchEngineSummaryRow = [
+    engine: SearchEngineId,
+    visitors: number,
+    views: number,
+];
+export type SearchTermSummaryRow = [
+    term: string,
+    visitors: number,
+    views: number,
+];
+export type SearchTermCoverage = {
+    visitorsWithTerm: number;
+    visitorsNotProvided: number;
+    visitorsTotal: number;
+    /** 0–1 share of search visitors that have an explicit keyword */
+    termCoverageRate: number | null;
+};
 /** Given an AnalyticsCountResult object, and an object representing a row returned from
  *  CF Analytics Engine w/ counts grouped by isVisitor, accumulate view,
  *  visit, and visitor counts.
@@ -1486,5 +1507,209 @@ export class AnalyticsEngineAPI {
                 counts.visitors,
                 counts.views,
             ]);
+    }
+
+    /**
+     * Search engine breakdown (organic referrer hosts).
+     */
+    async getSearchEngineSummary(
+        siteId: string,
+        interval: string,
+        tz?: string,
+        filters: SearchFilters = {},
+    ): Promise<SearchEngineSummaryRow[]> {
+        const { startIntervalSql, endIntervalSql } = intervalToSql(
+            interval,
+            tz,
+        );
+        const filterStr = filtersToSql(filters);
+
+        const query = `
+            SELECT
+                ${ColumnMappings.referrer} as referrer,
+                ${ColumnMappings.utmSource} as utmSource,
+                ${ColumnMappings.utmMedium} as utmMedium,
+                ${ColumnMappings.utmCampaign} as utmCampaign,
+                ${ColumnMappings.utmTerm} as utmTerm,
+                ${ColumnMappings.utmContent} as utmContent,
+                ${ColumnMappings.newVisitor} as isVisitor,
+                ${ColumnMappings.bounce} as isBounce,
+                SUM(_sample_interval) as count
+            FROM metricsDataset
+            WHERE timestamp >= ${startIntervalSql} AND timestamp < ${endIntervalSql}
+                AND ${ColumnMappings.siteId} = '${siteId}'
+                ${filterStr}
+            GROUP BY
+                ${ColumnMappings.referrer},
+                ${ColumnMappings.utmSource},
+                ${ColumnMappings.utmMedium},
+                ${ColumnMappings.utmCampaign},
+                ${ColumnMappings.utmTerm},
+                ${ColumnMappings.utmContent},
+                ${ColumnMappings.newVisitor},
+                ${ColumnMappings.bounce}
+            ORDER BY count DESC`;
+
+        type SelectionSet = {
+            referrer: string;
+            utmSource: string;
+            utmMedium: string;
+            utmCampaign: string;
+            utmTerm: string;
+            utmContent: string;
+            isVisitor: number;
+            isBounce: number;
+            count: number;
+        };
+
+        const response = await this.query(query);
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        const responseData =
+            (await response.json()) as AnalyticsQueryResult<SelectionSet>;
+        const countsByEngine = new Map<SearchEngineId, AnalyticsCountResult>();
+
+        responseData.data.forEach((row) => {
+            const engine = identifySearchEngine(row.referrer);
+            if (engine === "not-search") {
+                return;
+            }
+            const counts = countsByEngine.get(engine) || {
+                views: 0,
+                visitors: 0,
+                bounces: 0,
+            };
+            accumulateCountsFromRowResult(counts, row);
+            countsByEngine.set(engine, counts);
+        });
+
+        return Array.from(countsByEngine.entries())
+            .sort((a, b) => b[1].visitors - a[1].visitors)
+            .map(([engine, counts]) => [
+                engine,
+                counts.visitors,
+                counts.views,
+            ]);
+    }
+
+    /**
+     * Search terms when available from referrer query string or utm_term.
+     * Coverage: share of search visitors with an explicit keyword.
+     */
+    async getSearchTermSummary(
+        siteId: string,
+        interval: string,
+        tz?: string,
+        filters: SearchFilters = {},
+        page: number = 1,
+        limit: number = 10,
+    ): Promise<{
+        countsByProperty: SearchTermSummaryRow[];
+        coverage: SearchTermCoverage;
+    }> {
+        const { startIntervalSql, endIntervalSql } = intervalToSql(
+            interval,
+            tz,
+        );
+        const filterStr = filtersToSql(filters);
+
+        const query = `
+            SELECT
+                ${ColumnMappings.referrer} as referrer,
+                ${ColumnMappings.utmSource} as utmSource,
+                ${ColumnMappings.utmMedium} as utmMedium,
+                ${ColumnMappings.utmCampaign} as utmCampaign,
+                ${ColumnMappings.utmTerm} as utmTerm,
+                ${ColumnMappings.utmContent} as utmContent,
+                ${ColumnMappings.newVisitor} as isVisitor,
+                ${ColumnMappings.bounce} as isBounce,
+                SUM(_sample_interval) as count
+            FROM metricsDataset
+            WHERE timestamp >= ${startIntervalSql} AND timestamp < ${endIntervalSql}
+                AND ${ColumnMappings.siteId} = '${siteId}'
+                ${filterStr}
+            GROUP BY
+                ${ColumnMappings.referrer},
+                ${ColumnMappings.utmSource},
+                ${ColumnMappings.utmMedium},
+                ${ColumnMappings.utmCampaign},
+                ${ColumnMappings.utmTerm},
+                ${ColumnMappings.utmContent},
+                ${ColumnMappings.newVisitor},
+                ${ColumnMappings.bounce}
+            ORDER BY count DESC`;
+
+        type SelectionSet = {
+            referrer: string;
+            utmSource: string;
+            utmMedium: string;
+            utmCampaign: string;
+            utmTerm: string;
+            utmContent: string;
+            isVisitor: number;
+            isBounce: number;
+            count: number;
+        };
+
+        const response = await this.query(query);
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        const responseData =
+            (await response.json()) as AnalyticsQueryResult<SelectionSet>;
+        const countsByTerm = new Map<string, AnalyticsCountResult>();
+        let visitorsWithTerm = 0;
+        let visitorsNotProvided = 0;
+        let visitorsTotal = 0;
+
+        responseData.data.forEach((row) => {
+            const engine = identifySearchEngine(row.referrer);
+            const hasUtmTerm = Boolean(row.utmTerm && String(row.utmTerm).trim());
+            if (engine === "not-search" && !hasUtmTerm) {
+                return;
+            }
+
+            const term = extractSearchTerm(row);
+            const counts = countsByTerm.get(term) || {
+                views: 0,
+                visitors: 0,
+                bounces: 0,
+            };
+            accumulateCountsFromRowResult(counts, row);
+            countsByTerm.set(term, counts);
+
+            if (row.isVisitor == 1) {
+                visitorsTotal += Number(row.count);
+                if (term === SEARCH_TERM_NOT_PROVIDED) {
+                    visitorsNotProvided += Number(row.count);
+                } else {
+                    visitorsWithTerm += Number(row.count);
+                }
+            }
+        });
+
+        const allTerms = Array.from(countsByTerm.entries())
+            .sort((a, b) => b[1].visitors - a[1].visitors)
+            .map(
+                ([term, counts]) =>
+                    [term, counts.visitors, counts.views] as SearchTermSummaryRow,
+            );
+
+        const pageData = allTerms.slice(limit * (page - 1), limit * page);
+        const termCoverageRate =
+            visitorsTotal > 0 ? visitorsWithTerm / visitorsTotal : null;
+
+        return {
+            countsByProperty: pageData,
+            coverage: {
+                visitorsWithTerm,
+                visitorsNotProvided,
+                visitorsTotal,
+                termCoverageRate,
+            },
+        };
     }
 }

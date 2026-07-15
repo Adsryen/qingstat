@@ -29,6 +29,37 @@ export interface TrafficSourceInput {
     utmContent?: string | null;
 }
 
+/** Named search engines for detail reports. */
+export type SearchEngineId =
+    | "baidu"
+    | "google"
+    | "bing"
+    | "sogou"
+    | "so"
+    | "sm"
+    | "yahoo"
+    | "yandex"
+    | "duckduckgo"
+    | "other-search"
+    | "not-search";
+
+export const SEARCH_ENGINE_LABELS: Record<SearchEngineId, string> = {
+    baidu: "百度",
+    google: "Google",
+    bing: "Bing",
+    sogou: "搜狗",
+    so: "360搜索",
+    sm: "神马",
+    yahoo: "Yahoo",
+    yandex: "Yandex",
+    duckduckgo: "DuckDuckGo",
+    "other-search": "其他搜索",
+    "not-search": "非搜索",
+};
+
+/** Display when query param is absent (HTTPS referrer privacy). */
+export const SEARCH_TERM_NOT_PROVIDED = "(not provided)";
+
 const PAID_UTM_MEDIA = new Set([
     "ad",
     "ads",
@@ -73,6 +104,36 @@ const SOCIAL_DOMAINS = [
     "x.com",
     "xiaohongshu.com",
     "zhihu.com",
+];
+
+/** Domain suffix → engine id (order matters: more specific first). */
+const SEARCH_ENGINE_HOST_RULES: Array<{
+    match: string;
+    id: Exclude<SearchEngineId, "not-search" | "other-search">;
+}> = [
+    { match: "baidu.com", id: "baidu" },
+    { match: "bing.com", id: "bing" },
+    { match: "duckduckgo.com", id: "duckduckgo" },
+    { match: "sogou.com", id: "sogou" },
+    { match: "so.com", id: "so" },
+    { match: "sm.cn", id: "sm" },
+    { match: "google.", id: "google" },
+    { match: "yahoo.", id: "yahoo" },
+    { match: "yandex.", id: "yandex" },
+];
+
+/** Query param names commonly used for the search keyword. */
+const SEARCH_TERM_PARAMS = [
+    "q",
+    "query",
+    "wd",
+    "word",
+    "keyword",
+    "keywords",
+    "text",
+    "search",
+    "p",
+    "oq",
 ];
 
 function normalizeValue(value?: string | null) {
@@ -136,4 +197,70 @@ export function classifyTrafficSource(
     }
 
     return "external";
+}
+
+/**
+ * Identify which search engine a referrer belongs to.
+ * Non-search referrers return "not-search".
+ */
+export function identifySearchEngine(
+    referrer?: string | null,
+): SearchEngineId {
+    const raw = normalizeValue(referrer);
+    if (!raw) return "not-search";
+
+    let hostname: string;
+    try {
+        hostname = normalizeHostname(new URL(raw).hostname);
+    } catch {
+        return "not-search";
+    }
+
+    for (const rule of SEARCH_ENGINE_HOST_RULES) {
+        if (hostMatchesDomain(hostname, rule.match)) {
+            return rule.id;
+        }
+    }
+
+    if (hostMatchesAny(hostname, SEARCH_ENGINE_DOMAINS)) {
+        return "other-search";
+    }
+
+    return "not-search";
+}
+
+/**
+ * Extract a search keyword when the referrer URL still includes it.
+ * HTTPS privacy often strips q= → returns SEARCH_TERM_NOT_PROVIDED.
+ * Falls back to utm_term when present.
+ */
+export function extractSearchTerm(input: TrafficSourceInput): string {
+    const utmTerm = normalizeValue(input.utmTerm);
+    const referrer = normalizeValue(input.referrer);
+
+    if (referrer) {
+        try {
+            const url = new URL(referrer);
+            const engine = identifySearchEngine(referrer);
+            if (engine !== "not-search") {
+                for (const key of SEARCH_TERM_PARAMS) {
+                    const v = url.searchParams.get(key);
+                    if (v && v.trim()) {
+                        try {
+                            return decodeURIComponent(v.replace(/\+/g, " ")).trim();
+                        } catch {
+                            return v.trim();
+                        }
+                    }
+                }
+                if (utmTerm) return utmTerm;
+                return SEARCH_TERM_NOT_PROVIDED;
+            }
+        } catch {
+            // fall through
+        }
+    }
+
+    if (utmTerm) return utmTerm;
+    return SEARCH_TERM_NOT_PROVIDED;
 }

@@ -230,6 +230,27 @@ describe("Dashboard route", () => {
                         },
                     },
                     {
+                        path: "/resources/search-engines",
+                        loader: () => {
+                            return { countsByProperty: [] };
+                        },
+                    },
+                    {
+                        path: "/resources/search-terms",
+                        loader: () => {
+                            return {
+                                countsByProperty: [],
+                                coverage: {
+                                    visitorsWithTerm: 0,
+                                    visitorsNotProvided: 0,
+                                    visitorsTotal: 0,
+                                    termCoverageRate: null,
+                                },
+                            };
+                        },
+                    },
+
+                    {
                         path: "/resources/entry-pages",
                         loader: () => {
                             return { countsByProperty: [] };
@@ -347,6 +368,8 @@ describe("Dashboard route", () => {
         expect(screen.getAllByText("Path").length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText("Referrer")).toBeInTheDocument();
         expect(screen.getByText("Source Type")).toBeInTheDocument();
+        expect(screen.getByText("Search Engine")).toBeInTheDocument();
+        expect(screen.getByText("Search Term")).toBeInTheDocument();
         expect(screen.getByText("New / returning visitors")).toBeInTheDocument();
         expect(screen.getByText("Entry Page")).toBeInTheDocument();
         expect(screen.getByText("Exit Page")).toBeInTheDocument();
@@ -465,6 +488,27 @@ describe("Dashboard route", () => {
                             };
                         },
                     },
+                    {
+                        path: "/resources/search-engines",
+                        loader: () => {
+                            return { countsByProperty: [["google", 10, 12]] };
+                        },
+                    },
+                    {
+                        path: "/resources/search-terms",
+                        loader: () => {
+                            return {
+                                countsByProperty: [],
+                                coverage: {
+                                    visitorsWithTerm: 0,
+                                    visitorsNotProvided: 0,
+                                    visitorsTotal: 0,
+                                    termCoverageRate: null,
+                                },
+                            };
+                        },
+                    },
+
                     {
                         path: "/resources/entry-pages",
                         loader: () => {
