@@ -61,6 +61,7 @@ import { LivePulse } from "~/components/analytics/LivePulse";
 import { TimeSeriesCard } from "./resources.timeseries";
 import { StatsCard } from "./resources.stats";
 import { NewReturningCard } from "./resources.new-returning";
+import { VisitorLoyaltyCard } from "./resources.visitor-loyalty";
 import { useLocale } from "~/i18n/LocaleContext";
 import { getUser, isAuthEnabled } from "~/lib/auth";
 import { listSites } from "~/lib/sites";
@@ -331,6 +332,14 @@ export default function Dashboard() {
                 </div>
                 <div className="w-full mb-4">
                     <NewReturningCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        timezone={userTimezone}
+                    />
+                </div>
+                <div className="w-full mb-4">
+                    <VisitorLoyaltyCard
                         siteId={data.siteId}
                         interval={data.interval}
                         filters={data.filters}

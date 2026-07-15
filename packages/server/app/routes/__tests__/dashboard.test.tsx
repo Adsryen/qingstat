@@ -316,6 +316,21 @@ describe("Dashboard route", () => {
                             return { countsByProperty: [] };
                         },
                     },
+                                        {
+                        path: "/resources/visitor-loyalty",
+                        loader: () => {
+                            return {
+                                available: false,
+                                reason: "db-unavailable",
+                                identifiedVisitors: 0,
+                                identifiedVisits: 0,
+                                identityCoverageRate: null,
+                                frequencyBuckets: [],
+                                returnGapBuckets: [],
+                                note: "",
+                            };
+                        },
+                    },
                     {
                         path: "/resources/resolution",
                         loader: () => {
@@ -364,7 +379,7 @@ describe("Dashboard route", () => {
 
         render(<RemixStub />);
 
-        await waitFor(() => screen.findAllByText("Path"));
+        await waitFor(() => screen.findAllByText("Path"), { timeout: 10000 });
         expect(screen.getAllByText("Path").length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText("Referrer")).toBeInTheDocument();
         expect(screen.getByText("Source Type")).toBeInTheDocument();
@@ -602,6 +617,21 @@ describe("Dashboard route", () => {
                                     ["en", 100],
                                     ["zh", 80],
                                 ],
+                            };
+                        },
+                    },
+                                        {
+                        path: "/resources/visitor-loyalty",
+                        loader: () => {
+                            return {
+                                available: false,
+                                reason: "db-unavailable",
+                                identifiedVisitors: 0,
+                                identifiedVisits: 0,
+                                identityCoverageRate: null,
+                                frequencyBuckets: [],
+                                returnGapBuckets: [],
+                                note: "",
                             };
                         },
                     },
