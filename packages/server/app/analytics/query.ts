@@ -145,6 +145,22 @@ function generateEmptyRowsOverInterval(
     return initialRows;
 }
 
+/**
+ * Parse "1920x1080" (or "0x0") into integer width/height.
+ * Returns null if the string is not a valid pair of non-negative integers.
+ */
+export function parseScreenResolutionFilter(
+    value: string | undefined,
+): { width: number; height: number } | null {
+    if (!value) return null;
+    const match = /^(\d+)x(\d+)$/i.exec(value.trim());
+    if (!match) return null;
+    const width = Number(match[1]);
+    const height = Number(match[2]);
+    if (!Number.isFinite(width) || !Number.isFinite(height)) return null;
+    return { width, height };
+}
+
 function filtersToSql(filters: SearchFilters) {
     type ColumnFilterKey = Extract<
         keyof SearchFilters,
@@ -174,6 +190,16 @@ function filtersToSql(filters: SearchFilters) {
             filterStr += ` AND ${ColumnMappings[filter]} = '${filters[filter]}'`;
         }
     });
+
+    // screenResolution is a composite "WxH" filter over double6 + double7
+    if (Object.hasOwnProperty.call(filters, "screenResolution")) {
+        const parsed = parseScreenResolutionFilter(filters.screenResolution);
+        if (parsed) {
+            filterStr += ` AND ${ColumnMappings.screenWidth} = ${parsed.width}`;
+            filterStr += ` AND ${ColumnMappings.screenHeight} = ${parsed.height}`;
+        }
+    }
+
     return filterStr;
 }
 
@@ -991,6 +1017,69 @@ export class AnalyticsEngineAPI {
             tz,
             filters,
             page,
+        );
+    }
+
+    /**
+     * Group visitors by bucketed screen resolution (double6 x double7).
+     * Returns labels like "1920x1080".
+     */
+    async getCountByScreenResolution(
+        siteId: string,
+        interval: string,
+        tz?: string,
+        filters: SearchFilters = {},
+        page: number = 1,
+        limit: number = 10,
+    ): Promise<[resolution: string, visitors: number][]> {
+        const { startIntervalSql, endIntervalSql } = intervalToSql(
+            interval,
+            tz,
+        );
+        const filterStr = filtersToSql(filters);
+        const widthCol = ColumnMappings.screenWidth;
+        const heightCol = ColumnMappings.screenHeight;
+
+        const query = `
+            SELECT ${widthCol}, ${heightCol}, SUM(_sample_interval) as count
+            FROM metricsDataset
+            WHERE timestamp >= ${startIntervalSql} AND timestamp < ${endIntervalSql}
+                AND ${ColumnMappings.newVisitor} = 1
+                AND ${ColumnMappings.siteId} = '${siteId}'
+                ${filterStr}
+            GROUP BY ${widthCol}, ${heightCol}
+            ORDER BY count DESC
+            LIMIT ${limit * page}`;
+
+        type SelectionSet = {
+            count: number;
+        } & Record<typeof widthCol | typeof heightCol, number>;
+
+        const queryResult = this.query(query);
+        return new Promise<[string, number][]>((resolve, reject) =>
+            (async () => {
+                const response = await queryResult;
+
+                if (!response.ok) {
+                    reject(response.statusText);
+                }
+
+                const responseData =
+                    (await response.json()) as AnalyticsQueryResult<SelectionSet>;
+
+                const pageData = responseData.data.slice(
+                    limit * (page - 1),
+                    limit * page,
+                );
+
+                resolve(
+                    pageData.map((row) => {
+                        const w = Number(row[widthCol]) || 0;
+                        const h = Number(row[heightCol]) || 0;
+                        return [`${w}x${h}`, Number(row["count"])] as const;
+                    }),
+                );
+            })(),
         );
     }
 

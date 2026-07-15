@@ -72,6 +72,16 @@ describe("getFiltersFromSearchParams", () => {
             path: "/",
         });
     });
+
+    test("it should handle screenResolution filter", () => {
+        const searchParams = new URLSearchParams(
+            "?screenResolution=1920x1080&path=/",
+        );
+        expect(getFiltersFromSearchParams(searchParams)).toEqual({
+            screenResolution: "1920x1080",
+            path: "/",
+        });
+    });
 });
 
 describe("getDateTimeRange", () => {

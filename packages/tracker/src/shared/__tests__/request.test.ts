@@ -169,6 +169,52 @@ describe("Shared Request Utils", () => {
             expect(result).not.toHaveProperty("ip");
             expect(result).not.toHaveProperty("client_ip");
         });
+
+        it("should include sw/sh when screen size is available", () => {
+            const result = buildCollectRequestParams(
+                "test-site",
+                "https://example.com",
+                "/path",
+                "",
+                {},
+                undefined,
+                undefined,
+                undefined,
+                { width: 1920, height: 1080 },
+            );
+
+            expect(result).toEqual({
+                p: "/path",
+                h: "https://example.com",
+                r: "",
+                sid: "test-site",
+                sw: "1920",
+                sh: "1080",
+            });
+        });
+
+        it("should omit sw/sh when screen size is missing or invalid", () => {
+            const result = buildCollectRequestParams(
+                "test-site",
+                "https://example.com",
+                "/path",
+                "",
+                {},
+                undefined,
+                undefined,
+                undefined,
+                { width: 0, height: -1 },
+            );
+
+            expect(result).toEqual({
+                p: "/path",
+                h: "https://example.com",
+                r: "",
+                sid: "test-site",
+            });
+            expect(result).not.toHaveProperty("sw");
+            expect(result).not.toHaveProperty("sh");
+        });
     });
 
     describe("buildCollectUrl", () => {

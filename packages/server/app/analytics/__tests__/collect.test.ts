@@ -235,6 +235,8 @@ describe("collectRequestHandler", () => {
                 1, // new visit, so bounce
                 37.7749, // latitude
                 -122.4194, // longitude
+                0, // screenWidth unknown
+                0, // screenHeight unknown
             ],
             indexes: [
                 "example", // site id is index
@@ -263,6 +265,8 @@ describe("collectRequestHandler", () => {
                 1, // new visit, so bounce,
                 0,
                 0,
+                0, // screenWidth
+                0, // screenHeight
             ],
         );
     });
@@ -294,6 +298,8 @@ describe("collectRequestHandler", () => {
                 0, // NOT first or second visit,
                 0,
                 0,
+                0, // screenWidth
+                0, // screenHeight
             ],
         );
     });
@@ -330,6 +336,8 @@ describe("collectRequestHandler", () => {
                 1, // new visitor so bounce counted,
                 0,
                 0,
+                0, // screenWidth
+                0, // screenHeight
             ],
         );
     });
@@ -361,6 +369,8 @@ describe("collectRequestHandler", () => {
                 1, // new visitor so bounce
                 0,
                 0,
+                0, // screenWidth
+                0, // screenHeight
             ],
         );
     });
@@ -392,6 +402,8 @@ describe("collectRequestHandler", () => {
                 1, // new visitor so bounce
                 0,
                 0,
+                0, // screenWidth
+                0, // screenHeight
             ],
         );
     });
@@ -431,6 +443,8 @@ describe("collectRequestHandler", () => {
                 -1, // First visit after the initial visit so decrement bounce,
                 0,
                 0,
+                0, // screenWidth
+                0, // screenHeight
             ],
         );
     });
@@ -472,6 +486,8 @@ describe("collectRequestHandler", () => {
                 0, // After the second visit so no bounce,
                 0,
                 0,
+                0, // screenWidth
+                0, // screenHeight
             ],
         );
     });
@@ -570,7 +586,7 @@ describe("collectRequestHandler", () => {
         expect(writeDataPoint).toHaveBeenCalled();
         const datapoint = (writeDataPoint as Mock).mock.calls[0][0];
         expect(datapoint.blobs).toHaveLength(20);
-        expect(datapoint.doubles).toHaveLength(5);
+        expect(datapoint.doubles).toHaveLength(7);
         expect(datapoint.blobs).not.toContain("203.0.113.10");
         expect(datapoint.blobs).not.toContain("198.51.100.20");
     });
@@ -615,7 +631,7 @@ describe("collectRequestHandler", () => {
 
         const datapoint = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock.calls[0][0];
         expect(datapoint.blobs).toHaveLength(20);
-        expect(datapoint.doubles).toHaveLength(5);
+        expect(datapoint.doubles).toHaveLength(7);
         expect(datapoint.blobs).not.toContain("client-pv-123");
     });
 
@@ -713,5 +729,55 @@ describe("collectRequestHandler", () => {
         expect(blobs).toHaveLength(20);
         expect(blobs[18]).toBe("Windows"); // osName
         expect(blobs[19]).toBe("zh"); // browserLanguage primary tag
+    });
+
+    test("buckets sw/sh into doubles[5] and doubles[6]", async () => {
+        const env = {
+            WEB_COUNTER_AE: {
+                writeDataPoint: vi.fn(),
+            } as AnalyticsEngineDataset,
+        } as Env;
+
+        const request = httpMocks.createRequest(
+            // @ts-expect-error - we're mocking the request object
+            generateRequestParams({}),
+        );
+        const url = new URL(request.url);
+        // Near 1920x1080 ladder entries
+        url.searchParams.set("sw", "1918");
+        url.searchParams.set("sh", "1079");
+        request.url = url.toString();
+
+        await collectRequestHandler(request as any, env);
+
+        const doubles = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock
+            .calls[0][0].doubles;
+        expect(doubles).toHaveLength(7);
+        expect(doubles[5]).toBe(1920); // screenWidth bucketed
+        expect(doubles[6]).toBe(1080); // screenHeight bucketed
+    });
+
+    test("missing or invalid sw/sh write 0 for screen doubles", async () => {
+        const env = {
+            WEB_COUNTER_AE: {
+                writeDataPoint: vi.fn(),
+            } as AnalyticsEngineDataset,
+        } as Env;
+
+        const request = httpMocks.createRequest(
+            // @ts-expect-error - we're mocking the request object
+            generateRequestParams({}),
+        );
+        const url = new URL(request.url);
+        url.searchParams.set("sw", "0");
+        url.searchParams.set("sh", "abc");
+        request.url = url.toString();
+
+        await collectRequestHandler(request as any, env);
+
+        const doubles = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock
+            .calls[0][0].doubles;
+        expect(doubles[5]).toBe(0);
+        expect(doubles[6]).toBe(0);
     });
 });

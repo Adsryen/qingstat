@@ -49,6 +49,14 @@ describe("metricsDataset v1 field registry", () => {
         expect(getMetricsV1FieldBySlot("blob20")?.logicalName).toBe(
             "browserLanguage",
         );
+        expect(getMetricsV1FieldBySlot("double6")?.status).toBe("used");
+        expect(getMetricsV1FieldBySlot("double6")?.logicalName).toBe(
+            "screenWidth",
+        );
+        expect(getMetricsV1FieldBySlot("double7")?.status).toBe("used");
+        expect(getMetricsV1FieldBySlot("double7")?.logicalName).toBe(
+            "screenHeight",
+        );
     });
 
     test("documents legacy visitor/session/bounce semantics as non-reusable", () => {

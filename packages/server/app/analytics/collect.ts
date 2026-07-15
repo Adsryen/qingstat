@@ -141,6 +141,50 @@ const UNKNOWN_DIMENSION = "(unknown)";
 const MAX_OS_NAME_LENGTH = 64;
 const MAX_BROWSER_LANGUAGE_LENGTH = 16;
 
+/**
+ * Fixed ladder of common screen dimensions (CSS px).
+ * Values snap to the nearest ladder entry; out-of-range clamps to min/max.
+ * Keeps cardinality bounded for AE grouping.
+ */
+export const SCREEN_DIMENSION_LADDER = [
+    320, 360, 375, 390, 412, 414, 428, 480, 540, 600, 640, 720, 768, 800, 820,
+    834, 854, 900, 960, 1024, 1080, 1125, 1136, 1170, 1200, 1280, 1334, 1366,
+    1400, 1440, 1512, 1536, 1600, 1680, 1792, 1800, 1920, 2048, 2160, 2304,
+    2400, 2436, 2532, 2560, 2732, 2880, 3000, 3200, 3440, 3840,
+] as const;
+
+/**
+ * Snap a raw screen dimension to the nearest ladder entry.
+ * Returns 0 for missing / non-positive / non-finite values.
+ */
+export function bucketScreenDimension(
+    value: number | string | undefined | null,
+): number {
+    if (value === undefined || value === null || value === "") return 0;
+    const n = typeof value === "number" ? value : Number(value);
+    if (!Number.isFinite(n) || n <= 0) return 0;
+    const rounded = Math.round(n);
+    const ladder = SCREEN_DIMENSION_LADDER;
+    const min = ladder[0];
+    const max = ladder[ladder.length - 1];
+    if (rounded <= min) return min;
+    if (rounded >= max) return max;
+
+    let best = min;
+    let bestDist = Math.abs(rounded - min);
+    for (let i = 1; i < ladder.length; i++) {
+        const dist = Math.abs(rounded - ladder[i]);
+        if (dist < bestDist) {
+            best = ladder[i];
+            bestDist = dist;
+        } else if (dist === bestDist && ladder[i] < best) {
+            // Prefer smaller bucket on exact midpoint ties
+            best = ladder[i];
+        }
+    }
+    return best;
+}
+
 /** Normalize OS name from ua-parser; empty → (unknown). */
 export function normalizeOsName(name: string | undefined | null): string {
     const trimmed = (name ?? "").trim();
@@ -370,6 +414,9 @@ export async function collectRequestHandler(
         utmCampaign: params.uc,
         utmTerm: params.ut,
         utmContent: params.uco,
+        // bucketed screen resolution (CSS px); missing → 0
+        screenWidth: bucketScreenDimension(params.sw),
+        screenHeight: bucketScreenDimension(params.sh),
         identity: identityParams.identity,
     };
 
@@ -488,6 +535,10 @@ interface DataPoint {
     bounce: number;
     latitude?: number;
     longitude?: number;
+    /** Bucketed screen width (CSS px); 0 = unknown */
+    screenWidth?: number;
+    /** Bucketed screen height (CSS px); 0 = unknown */
+    screenHeight?: number;
 }
 
 // NOTE: Cloudflare Analytics Engine has limits on total number of bytes, number of fields, etc.
@@ -529,6 +580,9 @@ export function writeDataPoint(
             // 0 means unknown / not provided (CF geo may be absent offline)
             data.latitude ?? 0,
             data.longitude ?? 0,
+            // 0 means unknown / not provided (old trackers omit sw/sh)
+            data.screenWidth ?? 0,
+            data.screenHeight ?? 0,
         ],
     };
 

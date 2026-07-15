@@ -365,10 +365,10 @@ export const METRICS_V1_BLOB_FIELDS = [
     }),
 ] as const;
 
-const reservedDoubleFields = Array.from({ length: 15 }, (_, index) =>
+const reservedDoubleFields = Array.from({ length: 13 }, (_, index) =>
     field({
-        slot: `double${index + 6}` as const,
-        logicalName: `reservedDouble${index + 6}`,
+        slot: `double${index + 8}` as const,
+        logicalName: `reservedDouble${index + 8}`,
         valueType: "number",
         status: "reserved",
         source: "reserved",
@@ -453,6 +453,34 @@ export const METRICS_V1_DOUBLE_FIELDS = [
         compatibility: "locked double5; 0 means unknown",
         rollup: "geo-device",
     }),
+    field({
+        slot: ColumnMappings.screenWidth,
+        logicalName: "screenWidth",
+        valueType: "number",
+        status: "used",
+        source: "collect.sw bucketed to fixed ladder",
+        cardinality: "numeric",
+        maxLength: null,
+        nullable: true,
+        privacy: "derived",
+        queryRole: "bucketed screen width (CSS px); paired with screenHeight",
+        compatibility: "locked double6; 0 means unknown; never store raw non-bucketed values",
+        rollup: "never",
+    }),
+    field({
+        slot: ColumnMappings.screenHeight,
+        logicalName: "screenHeight",
+        valueType: "number",
+        status: "used",
+        source: "collect.sh bucketed to fixed ladder",
+        cardinality: "numeric",
+        maxLength: null,
+        nullable: true,
+        privacy: "derived",
+        queryRole: "bucketed screen height (CSS px); paired with screenWidth",
+        compatibility: "locked double7; 0 means unknown; never store raw non-bucketed values",
+        rollup: "never",
+    }),
     ...reservedDoubleFields,
 ] as const;
 
@@ -521,7 +549,7 @@ export const ANALYTICS_STORAGE_ASSIGNMENTS = [
         datasetOrTable: "clientEventsDataset (planned)",
         exactness: "estimated",
         retainedFor: "separate dataset budget and coverage disclosure",
-        notes: "OS name and browser language live in metricsDataset v1 blob19/20. Resolution/performance/errors still need a separate budgeted dataset.",
+        notes: "OS name and browser language live in metricsDataset v1 blob19/20. Bucketed screen resolution lives in double6/7. Performance/errors still need a separate budgeted dataset.",
     },
     {
         capability: "custom-events-and-conversions",
@@ -537,7 +565,7 @@ export const ANALYTICS_STORAGE_ASSIGNMENTS = [
         datasetOrTable: "clientEventsDataset (planned)",
         exactness: "estimated",
         retainedFor: "separate dataset budget and coverage disclosure",
-        notes: "Screen resolution, Web Vitals and error events remain out of metricsDataset v1.",
+        notes: "Bucketed screen resolution is in metricsDataset v1 double6/7. Web Vitals and error events remain out of metricsDataset v1.",
     },
     {
         capability: "long-term-anonymous-aggregates",

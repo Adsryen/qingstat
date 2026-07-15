@@ -60,4 +60,8 @@ export const ColumnMappings = {
     // (city-level; raw IP is intentionally not stored)
     latitude: "double4",
     longitude: "double5",
+
+    // bucketed screen dimensions (CSS px); 0 means unknown / not provided
+    screenWidth: "double6",
+    screenHeight: "double7",
 } as const;

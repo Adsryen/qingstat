@@ -14,6 +14,8 @@ export type CollectRequestParams = {
     r: string; // referrer
     sid: string; // siteId
     ht?: string; // hit type
+    sw?: string; // screen width (CSS px)
+    sh?: string; // screen height (CSS px)
     [key: string]: string | undefined; // Allow additional string properties
 } & UtmParams;
 

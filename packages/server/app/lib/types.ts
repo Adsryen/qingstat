@@ -13,6 +13,8 @@ export interface SearchFilters {
     browserVersion?: string;
     osName?: string;
     browserLanguage?: string;
+    /** Combined "WxH" label, e.g. "1920x1080"; parsed to double6/double7 equality. */
+    screenResolution?: string;
     utmSource?: string;
     utmMedium?: string;
     utmCampaign?: string;

@@ -59,6 +59,9 @@ export function getFiltersFromSearchParams(searchParams: URLSearchParams) {
     if (searchParams.has("browserLanguage")) {
         filters.browserLanguage = searchParams.get("browserLanguage") || "";
     }
+    if (searchParams.has("screenResolution")) {
+        filters.screenResolution = searchParams.get("screenResolution") || "";
+    }
     if (searchParams.has("utmSource")) {
         filters.utmSource = searchParams.get("utmSource") || "";
     }

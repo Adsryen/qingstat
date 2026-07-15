@@ -115,6 +115,18 @@ export async function trackPageview(
         // The collect endpoint will handle the missing parameters
     }
 
+    let screenSize: { width?: number; height?: number } | undefined;
+    try {
+        if (typeof window !== "undefined" && window.screen) {
+            screenSize = {
+                width: window.screen.width,
+                height: window.screen.height,
+            };
+        }
+    } catch {
+        // ignore environments without screen
+    }
+
     const requestParams = buildCollectRequestParams(
         client.siteId,
         hostname,
@@ -124,6 +136,7 @@ export async function trackPageview(
         hitType,
         identityContext,
         clientPageviewId,
+        screenSize,
     );
 
     makeRequest(client.reporterUrl, requestParams);

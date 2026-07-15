@@ -47,6 +47,16 @@ describe("trackPageview", () => {
 
         // Mock document.querySelector for canonical URL
         vi.spyOn(document, "querySelector").mockReturnValue(null);
+
+        // Mock window.screen for resolution reporting
+        Object.defineProperty(window, "screen", {
+            writable: true,
+            configurable: true,
+            value: {
+                width: 1920,
+                height: 1080,
+            },
+        });
     });
 
     afterEach(() => {
@@ -140,6 +150,32 @@ describe("trackPageview", () => {
                 r: "",
                 sid: "test-site",
                 ht: "1", // First hit (new visit)
+                sw: "1920",
+                sh: "1080",
+            }),
+        );
+    });
+
+    test("should include screen width/height from window.screen", async () => {
+        Object.defineProperty(window, "screen", {
+            writable: true,
+            configurable: true,
+            value: { width: 1366, height: 768 },
+        });
+
+        const client = new Client({
+            siteId: "test-site",
+            reporterUrl: "https://example.com/collect",
+            autoTrackPageviews: false,
+        });
+
+        await trackPageview(client);
+
+        expect(makeRequestMock).toHaveBeenCalledWith(
+            "https://example.com/collect",
+            expect.objectContaining({
+                sw: "1366",
+                sh: "768",
             }),
         );
     });

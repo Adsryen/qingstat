@@ -5,6 +5,11 @@ import type {
 } from "./types";
 import { queryParamStringify } from "./utils";
 
+export type ScreenSizeParams = {
+    width?: number;
+    height?: number;
+};
+
 export function buildCollectRequestParams(
     siteId: string,
     hostname: string,
@@ -14,6 +19,7 @@ export function buildCollectRequestParams(
     hitType?: string,
     identity?: IdentityRequestParams,
     clientPageviewId?: string,
+    screenSize?: ScreenSizeParams,
 ): CollectRequestParams {
     const params: CollectRequestParams = {
         p: path,
@@ -36,6 +42,24 @@ export function buildCollectRequestParams(
 
     if (clientPageviewId) {
         params.pid = clientPageviewId;
+    }
+
+    if (
+        screenSize &&
+        typeof screenSize.width === "number" &&
+        Number.isFinite(screenSize.width) &&
+        screenSize.width > 0
+    ) {
+        params.sw = String(Math.round(screenSize.width));
+    }
+
+    if (
+        screenSize &&
+        typeof screenSize.height === "number" &&
+        Number.isFinite(screenSize.height) &&
+        screenSize.height > 0
+    ) {
+        params.sh = String(Math.round(screenSize.height));
     }
 
     Object.assign(params, utmParams);

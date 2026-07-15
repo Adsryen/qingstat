@@ -290,6 +290,12 @@ describe("Dashboard route", () => {
                         },
                     },
                     {
+                        path: "/resources/resolution",
+                        loader: () => {
+                            return { countsByProperty: [] };
+                        },
+                    },
+                    {
                         path: "/resources/browserversion",
                         loader: () => {
                             return { countsByProperty: [] };
@@ -536,6 +542,17 @@ describe("Dashboard route", () => {
                                 countsByProperty: [
                                     ["en", 100],
                                     ["zh", 80],
+                                ],
+                            };
+                        },
+                    },
+                    {
+                        path: "/resources/resolution",
+                        loader: () => {
+                            return {
+                                countsByProperty: [
+                                    ["1920x1080", 100],
+                                    ["1366x768", 80],
                                 ],
                             };
                         },
