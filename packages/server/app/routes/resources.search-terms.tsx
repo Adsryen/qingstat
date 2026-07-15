@@ -45,7 +45,7 @@ export const SearchTermsCard = ({
     siteId,
     interval,
     filters,
-    onFilterChange,
+    onFilterChange: _onFilterChange,
     timezone,
 }: {
     siteId: string;
