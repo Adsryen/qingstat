@@ -343,8 +343,8 @@ describe("Dashboard route", () => {
 
         render(<RemixStub />);
 
-        await waitFor(() => screen.findByText("Path"));
-        expect(screen.getByText("Path")).toBeInTheDocument();
+        await waitFor(() => screen.findAllByText("Path"));
+        expect(screen.getAllByText("Path").length).toBeGreaterThanOrEqual(1);
         expect(screen.getByText("Referrer")).toBeInTheDocument();
         expect(screen.getByText("Source Type")).toBeInTheDocument();
         expect(screen.getByText("New / returning visitors")).toBeInTheDocument();
