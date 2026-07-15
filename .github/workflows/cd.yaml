@@ -30,7 +30,7 @@ jobs:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ef8e0352e51348a84bdf842749cb7491
                   workingDirectory: "packages/server"
-                  command: d1 migrations apply counterscale --remote
+                  command: d1 migrations apply qingstat --remote
             - name: Warn if D1 migrations failed
               if: steps.d1_migrations.outcome == 'failure'
               run: |

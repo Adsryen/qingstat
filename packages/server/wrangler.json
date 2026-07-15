@@ -1,6 +1,6 @@
 {
     "main": "./workers/app.ts",
-    "name": "counterscale",
+    "name": "qingstat",
     "account_id": "ef8e0352e51348a84bdf842749cb7491",
     "compatibility_flags": [
         "nodejs_compat_v2"
@@ -18,8 +18,8 @@
     ],
     "r2_buckets": [
         {
-            "bucket_name": "counterscale-daily-rollups",
-            "preview_bucket_name": "counterscale-daily-rollups-dev",
+            "bucket_name": "qingstat-daily-rollups",
+            "preview_bucket_name": "qingstat-daily-rollups-dev",
             "binding": "DAILY_ROLLUPS"
         }
     ],
@@ -31,8 +31,8 @@
     "d1_databases": [
         {
             "binding": "DB",
-            "database_name": "counterscale",
-            "database_id": "63a56a11-4de0-404a-af96-21e03995cc78",
+            "database_name": "qingstat",
+            "database_id": "19666f37-1271-40fa-85ab-9d2de802fc6d",
             "migrations_dir": "./migrations"
         }
     ],

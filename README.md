@@ -1,4 +1,4 @@
-﻿# 轻统计 · Qingstat
+# 轻统计 · Qingstat
 
 ![](/packages/server/public/counterscale-logo-300x300.webp)
 
@@ -30,13 +30,14 @@
 |----|-----|
 | 产品名 | 轻统计 · Qingstat |
 | 代码仓库 | https://github.com/Adsryen/qingstat |
-| Worker 脚本名 | `counterscale`（CF 侧暂保留） |
+| Worker 脚本名 | `qingstat` |
+| workers.dev | https://qingstat.prl.workers.dev |
 | URL | https://pv.we-together.club |
 | AE | `metricsDataset`（`WEB_COUNTER_AE`） |
-| D1 | `counterscale`（`DB`） |
-| R2 | `counterscale-daily-rollups` |
+| D1 | `qingstat`（id `19666f37-1271-40fa-85ab-9d2de802fc6d`，binding `DB`） |
+| R2 | `qingstat-daily-rollups` |
 
-> 代码包名与品牌为 `@qingstat/*` / 轻统计；Cloudflare 资源名仍用 `counterscale`，避免生产中断。
+> 旧资源 `counterscale` / `counterscale-daily-rollups` 已停用或仅作备份，新部署一律使用 `qingstat*`。
 
 #### Windows 部署
 
@@ -48,7 +49,7 @@ Set-Location packages/server
 npx wrangler deploy --var "VERSION:$sha"
 ```
 
-D1：`npx wrangler d1 migrations apply counterscale --remote`
+D1：`npx wrangler d1 migrations apply qingstat --remote`
 
 ## 许可证
 

@@ -25,3 +25,6 @@ __screenshots__
 .opencode/
 AGENTS.md
 .trellis/
+# D1 migration dumps
+packages/server/_migrate_from_counterscale.sql
+packages/server/_migrate_*.sql
