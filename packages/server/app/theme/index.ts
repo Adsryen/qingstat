@@ -1,7 +1,7 @@
 export type ThemePreference = "light" | "dark" | "system";
 export type ResolvedTheme = "light" | "dark";
 
-export const THEME_COOKIE = "__counterscale_theme";
+export const THEME_COOKIE = "__qingstat_theme";
 export const DEFAULT_THEME: ThemePreference = "system";
 
 export function isThemePreference(

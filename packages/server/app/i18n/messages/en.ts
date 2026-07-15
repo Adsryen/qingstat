@@ -23,7 +23,7 @@ export const en: Messages = {
         note: "Tracker script and /collect stay public so sites can report without login.",
     },
     login: {
-        title: "Welcome to Counterscale",
+        title: "Welcome to Qingstat (轻统计)",
         consoleTitle: "Console sign-in",
         subtitleGuest: "Enter your password to access the admin console",
         subtitleAuthed: "Continue to the admin console.",
@@ -50,7 +50,7 @@ export const en: Messages = {
         htmlTitle: "HTML script (CDN)",
         htmlDesc: "Paste before </body> on any site.",
         moduleTitle: "JavaScript module",
-        moduleDesc: "For SPAs. Install @counterscale/tracker then call init.",
+        moduleDesc: "For SPAs. Install @qingstat/tracker then call init.",
         copy: "Copy",
         copied: "Copied",
         openDashboardSite: "Open dashboard for this site",

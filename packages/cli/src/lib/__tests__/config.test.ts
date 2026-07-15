@@ -17,7 +17,7 @@ vi.mock("inquirer", () => ({
 
 vi.mock("figlet", () => ({
     default: {
-        textSync: vi.fn(() => "Counterscale"),
+        textSync: vi.fn(() => "Qingstat"),
     },
 }));
 
@@ -69,16 +69,16 @@ describe("CLI Functions", () => {
             const { fileURLToPath } = await import("url");
             
             // Mock fileURLToPath to return a specific path
-            vi.mocked(fileURLToPath).mockReturnValue("/some/path/to/node_modules/@counterscale/cli/dist/config.js");
+            vi.mocked(fileURLToPath).mockReturnValue("/some/path/to/node_modules/@qingstat/cli/dist/config.js");
             
             // Mock dirname to return the directory
             vi.mocked(dirname).mockReturnValue(
-                "/some/path/to/node_modules/@counterscale/cli/dist",
+                "/some/path/to/node_modules/@qingstat/cli/dist",
             );
 
             // Mock existsSync to return true only for the node_modules path
-            // The actual path construction goes up 4 levels from __dirname then to @counterscale/server
-            const expectedPath = "/some/path/to/@counterscale/server";
+            // The actual path construction goes up 4 levels from __dirname then to @qingstat/server
+            const expectedPath = "/some/path/to/@qingstat/server";
             vi.mocked(existsSync).mockImplementation((p) => p === expectedPath);
 
             const result = getServerPkgDir();
@@ -94,10 +94,10 @@ describe("CLI Functions", () => {
             const { fileURLToPath } = await import("url");
             
             // Mock fileURLToPath to return a monorepo path
-            vi.mocked(fileURLToPath).mockReturnValue("/monorepo/checkout/counterscale/packages/cli/dist/config.js");
+            vi.mocked(fileURLToPath).mockReturnValue("/monorepo/checkout/qingstat/packages/cli/dist/config.js");
             
             vi.mocked(dirname).mockReturnValue(
-                "/monorepo/checkout/counterscale/packages/cli/dist",
+                "/monorepo/checkout/qingstat/packages/cli/dist",
             );
 
             // Mock existsSync to return false for node_modules but true for monorepo path
@@ -114,7 +114,7 @@ describe("CLI Functions", () => {
             vi.mocked(existsSync).mockReturnValue(false);
 
             expect(() => getServerPkgDir()).toThrow(
-                /Could not find @counterscale\/server package/,
+                /Could not find @qingstat\/server package/,
             );
         });
     });
@@ -212,7 +212,7 @@ describe("CLI Functions", () => {
     describe("readInitialServerConfig", () => {
         it("should read and parse wrangler.json from server package", async () => {
             const mockConfig = {
-                name: "counterscale",
+                name: "Qingstat",
                 analytics_engine_datasets: [{ dataset: "default-dataset" }],
             };
 

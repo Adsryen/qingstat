@@ -13,7 +13,7 @@ import { ThemeSwitcher } from "~/components/ThemeSwitcher";
 import { useTheme } from "~/theme/ThemeContext";
 
 export const meta: MetaFunction = () => {
-    return [{ title: "Counterscale Settings" }];
+    return [{ title: "Qingstat Settings" }];
 };
 
 export async function loader({ context }: LoaderFunctionArgs) {

@@ -2,7 +2,7 @@ import type { LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 
 /**
- * Public front: analytics dashboard (PV/UV), same idea as upstream Counterscale.
+ * Public front: analytics dashboard (PV/UV), same idea as upstream Qingstat.
  * Password only protects /console management.
  */
 export async function loader({ request }: LoaderFunctionArgs) {

@@ -1,4 +1,4 @@
-import { createConfig } from "@counterscale/eslint-config";
+import { createConfig } from "@qingstat/eslint-config";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 

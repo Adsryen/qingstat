@@ -7,7 +7,7 @@ import { getVisitSummary, listVisitPageviews } from "~/lib/visit-details";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => [
-    { title: `Counterscale: ${data?.site?.name || data?.siteId || "Site"} visit trail` },
+    { title: `Qingstat: ${data?.site?.name || data?.siteId || "Site"} visit trail` },
 ];
 
 function ipConfig(env: Env) {

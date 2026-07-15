@@ -1,11 +1,11 @@
 "use strict";
 
-import * as Counterscale from "./index";
+import * as Qingstat from "./index";
 
 function findReporterScript() {
-    const el = document.getElementById(
-        "counterscale-script",
-    ) as HTMLScriptElement;
+    // Prefer new brand id; keep counterscale-script as a one-release fallback.
+    const el = (document.getElementById("qingstat-script") ||
+        document.getElementById("counterscale-script")) as HTMLScriptElement | null;
     return el;
 }
 
@@ -17,7 +17,10 @@ function getLegacySiteId(): string | undefined {
     type Command = [CommandName, ...CommandArgs];
 
     let siteId = undefined;
-    const queue = (window.counterscale && window.counterscale.q) || [];
+    const queue =
+        (window.qingstat && window.qingstat.q) ||
+        (window.counterscale && window.counterscale.q) ||
+        [];
     queue.forEach(function (cmd: Command) {
         // only interested in grabbing siteId
         if (cmd[0] === "set" && cmd[1] === "siteId") {
@@ -39,7 +42,7 @@ function init() {
         return;
     }
 
-    Counterscale.init({
+    Qingstat.init({
         siteId,
         reportOnLocalhost,
         reporterUrl,

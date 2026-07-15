@@ -27,7 +27,7 @@ export class CloudflareClient {
     constructor(configPath?: string) {
         this.configPath =
             configPath ||
-            path.join(homedir(), ".counterscale", "wrangler.json");
+            path.join(homedir(), ".qingstat", "wrangler.json");
     }
 
     async getAccountId(): Promise<string | null> {

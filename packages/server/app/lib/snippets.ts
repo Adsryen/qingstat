@@ -10,7 +10,7 @@ export function sanitizeSiteId(raw: string): string {
 export function buildHtmlSnippet(origin: string, siteId: string) {
     const sid = sanitizeSiteId(siteId);
     return `<script
-    id="counterscale-script"
+    id="qingstat-script"
     data-site-id="${sid}"
     src="${origin}/tracker.js"
     defer
@@ -19,9 +19,9 @@ export function buildHtmlSnippet(origin: string, siteId: string) {
 
 export function buildModuleSnippet(origin: string, siteId: string) {
     const sid = sanitizeSiteId(siteId);
-    return `import * as Counterscale from "@counterscale/tracker";
+    return `import * as Qingstat from "@qingstat/tracker";
 
-Counterscale.init({
+Qingstat.init({
     siteId: "${sid}",
     reporterUrl: "${origin}/collect",
 });`;

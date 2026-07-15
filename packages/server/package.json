@@ -1,12 +1,12 @@
 {
-    "name": "@counterscale/server",
+    "name": "@qingstat/server",
     "version": "3.4.1",
-    "description": "Counterscale Server",
-    "homepage": "https://counterscale.dev",
+    "description": "Qingstat Server",
+    "homepage": "https://github.com/Adsryen/qingstat",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/benvinegar/counterscale",
+        "url": "https://github.com/Adsryen/qingstat",
         "directory": "packages/server"
     },
     "engines": {
@@ -33,7 +33,7 @@
     },
     "dependencies": {
         "@cloudflare/kv-asset-handler": "^0.3.3",
-        "@counterscale/tracker": "*",
+        "@qingstat/tracker": "workspace:*",
         "@radix-ui/react-select": "^2.1.0",
         "@radix-ui/react-slot": "^1.1.0",
         "@react-router/cloudflare": "7.1.1",
@@ -56,7 +56,7 @@
     },
     "devDependencies": {
         "@cloudflare/workers-types": "^4.20250803.0",
-        "@counterscale/eslint-config": "workspace:*",
+        "@qingstat/eslint-config": "workspace:*",
         "@react-router/dev": "7.7.1",
         "@react-router/fs-routes": "7.7.1",
         "@testing-library/react": "^16.2.0",

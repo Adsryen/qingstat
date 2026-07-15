@@ -20,6 +20,7 @@ __screenshots__
 .idea
 .agents/
 .claude/
+.trae/
 .codex/
 .opencode/
 AGENTS.md

@@ -18,7 +18,7 @@ import {
 } from "~/lib/snippets";
 
 export const meta: MetaFunction = () => {
-    return [{ title: "Counterscale: Tracking code" }];
+    return [{ title: "Qingstat: Tracking code" }];
 };
 
 export async function loader({ request, context, params }: LoaderFunctionArgs) {
@@ -118,7 +118,7 @@ export default function ConsoleSiteCode() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                     <pre className="text-sm bg-muted p-4 rounded-xl overflow-x-auto">
-                        npm install @counterscale/tracker
+                        npm install @qingstat/tracker
                     </pre>
                     <pre className="text-sm bg-muted p-4 rounded-xl overflow-x-auto whitespace-pre-wrap">
                         {moduleSnippet}

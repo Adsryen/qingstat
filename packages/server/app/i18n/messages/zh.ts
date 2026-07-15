@@ -23,7 +23,7 @@ export const zh: Messages = {
         note: "埋点脚本与 /collect 接口始终公开，无需登录即可上报。",
     },
     login: {
-        title: "欢迎使用 Counterscale",
+        title: "欢迎使用轻统计",
         consoleTitle: "登录控制台",
         subtitleGuest: "请输入密码以访问管理后台",
         subtitleAuthed: "继续访问管理后台。",
@@ -50,7 +50,7 @@ export const zh: Messages = {
         htmlTitle: "HTML 脚本（CDN）",
         htmlDesc: "粘贴到任意站点的 </body> 之前。",
         moduleTitle: "JavaScript 模块",
-        moduleDesc: "适用于 SPA。安装 @counterscale/tracker 后调用 init。",
+        moduleDesc: "适用于 SPA。安装 @qingstat/tracker 后调用 init。",
         copy: "复制",
         copied: "已复制",
         openDashboardSite: "打开此站点仪表盘",

@@ -17,9 +17,9 @@ describe("theme helpers", () => {
 
     test("parseThemeCookie", () => {
         expect(
-            parseThemeCookie("__counterscale_theme=dark; other=1"),
+            parseThemeCookie("__qingstat_theme=dark; other=1"),
         ).toBe("dark");
-        expect(parseThemeCookie("__counterscale_theme=nope")).toBeNull();
+        expect(parseThemeCookie("__qingstat_theme=nope")).toBeNull();
         expect(parseThemeCookie(null)).toBeNull();
     });
 
@@ -28,14 +28,14 @@ describe("theme helpers", () => {
         expect(DEFAULT_THEME).toBe("system");
         expect(
             resolveThemePreference({
-                cookieHeader: "__counterscale_theme=light",
+                cookieHeader: "__qingstat_theme=light",
             }),
         ).toBe("light");
     });
 
     test("themeCookieHeader", () => {
         expect(themeCookieHeader("system")).toContain(
-            "__counterscale_theme=system",
+            "__qingstat_theme=system",
         );
         expect(themeCookieHeader("dark")).toContain("SameSite=Lax");
     });

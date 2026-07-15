@@ -102,11 +102,11 @@ export class IdentityManager {
     }
 
     private get identityKey(): string {
-        return `counterscale:identity:${this.siteId}`;
+        return `qingstat:identity:${this.siteId}`;
     }
 
     private get tabKey(): string {
-        return `counterscale:tab:${this.siteId}`;
+        return `qingstat:tab:${this.siteId}`;
     }
 
     private getPersistentContext(clientTime: number): IdentityContext {

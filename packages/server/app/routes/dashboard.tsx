@@ -62,8 +62,8 @@ import { canViewSiteStats } from "~/lib/siteAccess";
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "Counterscale: Web Analytics" },
-        { name: "description", content: "Counterscale: Web Analytics" },
+        { title: "轻统计 · Qingstat: Web Analytics" },
+        { name: "description", content: "轻统计 · Qingstat: Web Analytics" },
     ];
 };
 

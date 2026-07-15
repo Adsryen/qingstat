@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { cn } from "~/lib/utils";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => [
-    { title: `Counterscale: ${data?.site?.name || data?.siteId || "Site"} visitors` },
+    { title: `Qingstat: ${data?.site?.name || data?.siteId || "Site"} visitors` },
 ];
 
 function ipConfig(env: Env) {

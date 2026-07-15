@@ -3,7 +3,7 @@ import type { IdentityContext } from "./identity";
 type ActivityMessageType = "activity" | "pagehide";
 
 type ActivityMessage = {
-    type: "counterscale:activity";
+    type: "qingstat:activity";
     messageType: ActivityMessageType;
     siteId: string;
     visitId: string;
@@ -57,7 +57,7 @@ function isActivityMessage(
     }
 
     const message = value as Partial<ActivityMessage>;
-    return message.type === "counterscale:activity" && message.siteId === siteId;
+    return message.type === "qingstat:activity" && message.siteId === siteId;
 }
 
 export class ActivityManager {
@@ -81,7 +81,7 @@ export class ActivityManager {
     markActivity(messageType: ActivityMessageType = "activity"): IdentityContext {
         const context = this.getContext();
         this.broadcastChannel?.postMessage({
-            type: "counterscale:activity",
+            type: "qingstat:activity",
             messageType,
             siteId: this.siteId,
             visitId: context.visitId,
@@ -121,7 +121,7 @@ export class ActivityManager {
     }
 
     private get channelName(): string {
-        return `counterscale:activity:${this.siteId}`;
+        return `qingstat:activity:${this.siteId}`;
     }
 
     private registerLifecycleHandlers(): void {

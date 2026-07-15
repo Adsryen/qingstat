@@ -21,11 +21,11 @@ body:
       id: component
       attributes:
           label: Component
-          description: Which part of Counterscale would this feature affect?
+          description: Which part of Qingstat would this feature affect?
           options:
-              - "@counterscale/server"
-              - "@counterscale/cli"
-              - "@counterscale/tracker"
+              - "@qingstat/server"
+              - "@qingstat/cli"
+              - "@qingstat/tracker"
       validations:
           required: true
 

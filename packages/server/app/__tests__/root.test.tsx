@@ -130,8 +130,8 @@ describe("Layout", () => {
         function loader() {
             return {
                 version: "v1.2.3",
-                origin: "test.counterscale.dev",
-                url: "https://test.counterscale.dev/",
+                origin: "test.qingstat.dev",
+                url: "https://test.qingstat.dev/",
             };
         }
 
@@ -155,7 +155,7 @@ describe("Layout", () => {
         const meta = document.querySelector('meta[property="og:url"]');
         expect(meta).toHaveAttribute(
             "content",
-            "https://test.counterscale.dev/",
+            "https://test.qingstat.dev/",
         );
     });
 });

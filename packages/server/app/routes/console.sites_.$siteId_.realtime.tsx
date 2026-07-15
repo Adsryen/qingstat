@@ -1,4 +1,4 @@
-﻿import { useEffect } from "react";
+import { useEffect } from "react";
 import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 import { useFetcher, useLoaderData } from "react-router";
 
@@ -10,7 +10,7 @@ import { getSite } from "~/lib/sites";
 import { cn } from "~/lib/utils";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => [
-    { title: `Counterscale: ${data?.site?.name || data?.siteId || "Site"} realtime` },
+    { title: `Qingstat: ${data?.site?.name || data?.siteId || "Site"} realtime` },
 ];
 
 export async function loader({ request, context, params }: LoaderFunctionArgs) {

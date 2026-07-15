@@ -1,8 +1,8 @@
 {
-    "name": "@counterscale/tracker",
+    "name": "@qingstat/tracker",
     "version": "3.4.1",
-    "descriptrion": "Counterscale tracking library for recording pageviews",
-    "homepage": "https://counterscale.dev",
+    "descriptrion": "Qingstat tracking library for recording pageviews",
+    "homepage": "https://github.com/Adsryen/qingstat",
     "license": "MIT",
     "sideEffects": false,
     "type": "module",
@@ -19,7 +19,7 @@
         "typecheck": "tsc"
     },
     "devDependencies": {
-        "@counterscale/eslint-config": "workspace:*",
+        "@qingstat/eslint-config": "workspace:*",
         "@playwright/test": "^1.49.1",
         "@types/node": "^22.10.2",
         "@vitest/coverage-v8": "~4.0.8",

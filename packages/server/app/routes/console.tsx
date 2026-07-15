@@ -34,7 +34,7 @@ export default function ConsoleLayout() {
                             Console
                         </div>
                         <div className="text-lg font-semibold text-foreground">
-                            Counterscale
+                            Qingstat
                         </div>
                     </div>
                     <nav className="flex md:flex-col gap-1 overflow-x-auto">

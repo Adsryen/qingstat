@@ -2,7 +2,7 @@ export type Locale = "en" | "zh";
 
 export const LOCALES: Locale[] = ["en", "zh"];
 export const DEFAULT_LOCALE: Locale = "zh";
-export const LOCALE_COOKIE = "__counterscale_locale";
+export const LOCALE_COOKIE = "__qingstat_locale";
 
 export type Messages = {
     nav: {

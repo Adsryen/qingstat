@@ -39,7 +39,7 @@ import { cn } from "~/lib/utils";
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "Counterscale: Sites" },
+        { title: "Qingstat: Sites" },
         {
             name: "description",
             content: "Manage tracked sites",

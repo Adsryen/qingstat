@@ -26,7 +26,7 @@ export function getInitializedClient(): typeof GLOBALS["client"] {
 export function trackPageview(opts?: TrackPageviewOpts) {
     if (!GLOBALS.client) {
         throw new Error(
-            "You must call Counterscale.initialize() before calling Counterscale.trackPageview().",
+            "You must call Qingstat.initialize() before calling Qingstat.trackPageview().",
         );
     }
     _trackPageview(GLOBALS.client, opts);

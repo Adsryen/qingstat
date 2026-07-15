@@ -22,11 +22,11 @@ export const highlightTheme = {
 };
 
 export function getTitle(
-    counterscaleVersion: string,
+    QingstatVersion: string,
     homepage: string,
 ): string {
     const title = chalk.rgb(...CLI_COLORS.orange)(
-        figlet.textSync("Counterscale", {
+        figlet.textSync("Qingstat", {
             font: "Slant",
         }),
     );
@@ -34,7 +34,7 @@ export function getTitle(
     const subtitle = [
         chalk.rgb(...CLI_COLORS.tan).underline(homepage),
         "•",
-        chalk.rgb(...CLI_COLORS.tan)(counterscaleVersion),
+        chalk.rgb(...CLI_COLORS.tan)(QingstatVersion),
     ].join(" ");
 
     return `${title}\n${subtitle}`;
@@ -47,7 +47,7 @@ export function getScriptSnippet(
     return highlight(
         `
 <script
-    id="counterscale-script"
+    id="qingstat-script"
     data-site-id="YOUR_UNIQUE_SITE_ID__CHANGE_THIS"
     src="${deployUrl}/${scriptName}.js"
     defer
@@ -58,15 +58,15 @@ export function getScriptSnippet(
 
 export function getPackageSnippet(
     deployUrl: string,
-    counterscaleVersion: string,
+    QingstatVersion: string,
 ) {
     return highlight(
         `
-// $ npm install @counterscale/tracker@${counterscaleVersion}
+// $ npm install @qingstat/tracker@${QingstatVersion}
 
-import * as Counterscale from "@counterscale/tracker";
+import * as Qingstat from "@qingstat/tracker";
 
-Counterscale.init({
+Qingstat.init({
     siteId: "YOUR_UNIQUE_SITE_ID__CHANGE_THIS",
     reporterUrl: "${deployUrl}/collect",
 });`,

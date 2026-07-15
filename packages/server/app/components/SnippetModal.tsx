@@ -153,7 +153,7 @@ export function SnippetModal({ open, onClose, siteId, origin }: Props) {
                             </Button>
                         </div>
                         <pre className="text-xs sm:text-sm bg-muted p-3 rounded-xl overflow-x-auto">
-                            npm install @counterscale/tracker
+                            npm install @qingstat/tracker
                         </pre>
                         <pre className="text-xs sm:text-sm bg-muted p-3 rounded-xl overflow-x-auto whitespace-pre-wrap">
                             {moduleSnippet}

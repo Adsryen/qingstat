@@ -60,8 +60,8 @@ import { useLocale } from "~/i18n/LocaleContext";
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "Counterscale: Web Analytics" },
-        { name: "description", content: "Counterscale: Web Analytics" },
+        { title: "Qingstat: Web Analytics" },
+        { name: "description", content: "Qingstat: Web Analytics" },
     ];
 };
 

@@ -16,7 +16,7 @@ export async function makeRequest(
             method: "GET",
             headers: {
                 "Content-Type": "text/plain",
-                "User-Agent": "Counterscale-Tracker-Server/3.2.0",
+                "User-Agent": "Qingstat-Tracker-Server/3.2.0",
             },
             signal: controller.signal,
         });

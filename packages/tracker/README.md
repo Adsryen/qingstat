@@ -1,29 +1,29 @@
-# @counterscale/tracker
+# @qingstat/tracker
 
-Client-side page view tracking library for [Counterscale](https://counterscale.dev).
+Client-side page view tracking library for [Qingstat](https://github.com/Adsryen/qingstat).
 
-_For instructions on downloading and deploying the [Counterscale server](https://github.com/benvinegar/counterscale), consult the [project README](https://github.com/benvinegar/counterscale/blob/master/packages/server/README.md)._
+_For instructions on downloading and deploying the [Qingstat server](https://github.com/Adsryen/qingstat), consult the [project README](https://github.com/Adsryen/qingstat/blob/main/README.md)._
 
 ## Usage
 
 In your browser-based web project:
 
 ```bash
-npm install @counterscale/tracker
+npm install @qingstat/tracker
 ```
 
-Initialize Counterscale with your site ID and deployment URL:
+Initialize Qingstat with your site ID and deployment URL:
 
 ```typescript
-import * as Counterscale from "@counterscale/tracker";
+import * as Qingstat from "@qingstat/tracker";
 
-Counterscale.init({
+Qingstat.init({
     siteId: "your-unique-site-id",
     deploymentUrl: "https://{subdomain-emitted-during-deploy}.pages.dev/",
 });
 ```
 
-That's it! Your page views will automatically be tracked and reported to Counterscale.
+That's it! Your page views will automatically be tracked and reported to Qingstat.
 
 ## Advanced
 
@@ -31,17 +31,17 @@ That's it! Your page views will automatically be tracked and reported to Counter
 
 Alternatively you can track page view events manually.
 
-To do so, during initialization set `autoTrackPageviews` to `false`. Then, you manually call `Counterscale.trackPageview()` when you want to record a pageview.
+To do so, during initialization set `autoTrackPageviews` to `false`. Then, you manually call `Qingstat.trackPageview()` when you want to record a pageview.
 
 ```typescript
-import * as Counterscale from "@counterscale/tracker";
+import * as Qingstat from "@qingstat/tracker";
 
-Counterscale.init({
+Qingstat.init({
     siteId: "your-unique-site-id",
     deploymentUrl: "https://{subdomain-emitted-during-deploy}.pages.dev/",
     autoTrackPageviews: false, // <- don't forget this
 });
 
 // ... when a pageview happens
-Counterscale.trackPageview();
+Qingstat.trackPageview();
 ```

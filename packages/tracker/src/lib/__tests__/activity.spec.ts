@@ -56,7 +56,7 @@ describe("ActivityManager", () => {
             siteId: "site-a",
             getContext,
             createBroadcastChannel: (name) => {
-                expect(name).toBe("counterscale:activity:site-a");
+                expect(name).toBe("qingstat:activity:site-a");
                 return channel;
             },
         });
@@ -64,7 +64,7 @@ describe("ActivityManager", () => {
         manager.markActivity();
 
         expect(postMessage).toHaveBeenCalledWith({
-            type: "counterscale:activity",
+            type: "qingstat:activity",
             messageType: "activity",
             siteId: "site-a",
             visitId: "visit-broadcast",
@@ -91,7 +91,7 @@ describe("ActivityManager", () => {
 
         channel.onmessage?.({
             data: {
-                type: "counterscale:activity",
+                type: "qingstat:activity",
                 messageType: "activity",
                 siteId: "other-site",
             },
@@ -100,7 +100,7 @@ describe("ActivityManager", () => {
 
         channel.onmessage?.({
             data: {
-                type: "counterscale:activity",
+                type: "qingstat:activity",
                 messageType: "activity",
                 siteId: "site-a",
             },

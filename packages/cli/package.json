@@ -1,20 +1,20 @@
 {
-    "name": "@counterscale/cli",
+    "name": "@qingstat/cli",
     "version": "3.4.1",
-    "descriptrion": "CLI for managing Counterscale deployments",
-    "homepage": "https://counterscale.dev",
+    "descriptrion": "CLI for managing Qingstat deployments",
+    "homepage": "https://github.com/Adsryen/qingstat",
     "license": "MIT",
     "type": "module",
     "repository": {
         "type": "git",
-        "url": "https://github.com/benvinegar/counterscale",
+        "url": "https://github.com/Adsryen/qingstat",
         "directory": "packages/cli"
     },
     "engines": {
         "node": ">=20.0.0"
     },
     "bin": {
-        "counterscale": "./dist/index.js"
+        "qingstat": "./dist/index.js"
     },
     "scripts": {
         "build": "tsc --build",
@@ -28,7 +28,7 @@
     },
     "dependencies": {
         "@clack/prompts": "^0.10.0",
-        "@counterscale/server": "workspace:*",
+        "@qingstat/server": "workspace:*",
         "@types/node": "^22.10.2",
         "bcryptjs": "^3.0.2",
         "chalk": "^5.3.0",

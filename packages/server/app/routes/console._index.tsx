@@ -15,7 +15,7 @@ import {
 } from "~/components/ui/card";
 
 export const meta: MetaFunction = () => {
-    return [{ title: "Counterscale Console" }];
+    return [{ title: "Qingstat Console" }];
 };
 
 type SiteSummary = {

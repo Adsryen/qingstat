@@ -52,7 +52,7 @@ export async function login(_request: Request, password: string, env: Env) {
         env.CF_JWT_SECRET,
         {
             expiresIn: "30d",
-            issuer: "counterscale",
+            issuer: "Qingstat",
         },
     );
 
@@ -109,7 +109,7 @@ export async function getUser(request: Request, env: Env): Promise<User> {
             {} as Record<string, string>,
         );
 
-        const token = cookies["__counterscale_token"];
+        const token = cookies["__qingstat_token"];
         if (!token) {
             return { authenticated: false };
         }

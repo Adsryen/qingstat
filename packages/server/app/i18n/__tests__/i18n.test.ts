@@ -13,7 +13,7 @@ describe("i18n resolveLocale", () => {
     test("cookie wins over Accept-Language", () => {
         expect(
             resolveLocale({
-                cookieHeader: "__counterscale_locale=en; other=1",
+                cookieHeader: "__qingstat_locale=en; other=1",
                 acceptLanguage: "zh-CN,zh;q=0.9",
             }),
         ).toBe("en");
@@ -42,8 +42,8 @@ describe("i18n resolveLocale", () => {
     });
 
     test("parseLocaleCookie ignores invalid", () => {
-        expect(parseLocaleCookie("__counterscale_locale=fr")).toBeNull();
-        expect(parseLocaleCookie("__counterscale_locale=zh")).toBe("zh");
+        expect(parseLocaleCookie("__qingstat_locale=fr")).toBeNull();
+        expect(parseLocaleCookie("__qingstat_locale=zh")).toBe("zh");
     });
 
     test("localeFromAcceptLanguage", () => {

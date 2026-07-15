@@ -4,15 +4,15 @@
 
 ## Changes by Package
 
-### @counterscale/cli
+### @qingstat/cli
 
 <!-- Describe any changes made to the CLI package -->
 
-### @counterscale/server
+### @qingstat/server
 
 <!-- Describe any changes made to the server package -->
 
-### @counterscale/tracker
+### @qingstat/tracker
 
 <!-- Describe any changes made to the tracker package -->
 

@@ -3,13 +3,13 @@ import { homedir } from "node:os";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 
-export const COUNTERSCALE_DIR = path.join(homedir(), ".counterscale");
+export const QINGSTAT_DIR = path.join(homedir(), ".qingstat");
 
 const __filename = fileURLToPath(import.meta.url);
 
 /**
- * Finds the directory of the @counterscale/server package.
- * @returns The path to the @counterscale/server package directory.
+ * Finds the directory of the @qingstat/server package.
+ * @returns The path to the @qingstat/server package directory.
  */
 export function getServerPkgDir(): string {
     const __dirname = dirname(__filename);
@@ -36,7 +36,7 @@ export function getServerPkgDir(): string {
         "..",
         "..",
         "..",
-        "@counterscale",
+        "@qingstat",
         "server",
     );
     if (existsSync(nodeModulesDir)) {
@@ -44,7 +44,7 @@ export function getServerPkgDir(): string {
     }
 
     throw new Error(
-        "Could not find @counterscale/server package. Is it installed?",
+        "Could not find @qingstat/server package. Is it installed?",
     );
 }
 
@@ -107,7 +107,7 @@ export function getWorkerAndDatasetName(config: ReturnType<typeof JSON.parse>) {
 }
 
 /**
- * Reads the initial server config from the @counterscale/server package
+ * Reads the initial server config from the @qingstat/server package
  */
 export function readInitialServerConfig() {
     const serverPkgDir = getServerPkgDir();
@@ -119,7 +119,7 @@ export function readInitialServerConfig() {
 }
 
 /**
- * Writes a local copy of wrangler.json (in ~/.counterscale) where all the paths are
+ * Writes a local copy of wrangler.json (in ~/.qingstat) where all the paths are
  * converted to be absolute. This makes it so that the `wrangler deploy` command can be
  * run from any directory.
  */

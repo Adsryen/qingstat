@@ -36,7 +36,7 @@ describe("CloudflareClient", () => {
         it("should use default config path when not provided", () => {
             const defaultClient = new CloudflareClient();
             expect(defaultClient["configPath"]).toBe(
-                path.join(homedir(), ".counterscale", "wrangler.json"),
+                path.join(homedir(), ".qingstat", "wrangler.json"),
             );
         });
 

@@ -40,7 +40,7 @@ function getVersionMeta(version: string | null | undefined): {
 
     // Check if it's a semver (e.g., 1.2.3) or a git SHA
     const isSemver = /^\d+\.\d+\.\d+(?:-[\w.-]+)?(?:\+[\w.-]+)?$/.test(version);
-    const repo = "https://github.com/Adsryen/counterscale";
+    const repo = "https://github.com/Adsryen/qingstat";
 
     if (isSemver) {
         // Link to release page for semver
@@ -124,8 +124,8 @@ export const Layout = ({ children = [] }: { children: React.ReactNode }) => {
             url: "https://example.com/",
             name: "0.0.1",
         },
-        origin: "counterscale.dev",
-        url: "https://counterscale.dev/",
+        origin: "github.com/Adsryen/qingstat",
+        url: "https://github.com/Adsryen/qingstat/",
         locale: "zh" as Locale,
         theme: "system" as ThemePreference,
     };
@@ -148,27 +148,27 @@ export const Layout = ({ children = [] }: { children: React.ReactNode }) => {
 
                 <meta property="og:url" content={data.url} />
                 <meta property="og:type" content="website" />
-                <meta property="og:title" content="Counterscale" />
+                <meta property="og:title" content="Qingstat" />
                 <meta
                     property="og:description"
                     content="Scalable web analytics you run yourself on Cloudflare"
                 />
                 <meta
                     property="og:image"
-                    content={data.origin + "/counterscale-og-large.webp"}
+                    content={data.origin + "/Qingstat-og-large.webp"}
                 />
 
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta property="twitter:domain" content="counterscale.dev" />
+                <meta property="twitter:domain" content="github.com/Adsryen/qingstat" />
                 <meta property="twitter:url" content={data.url} />
-                <meta name="twitter:title" content="Counterscale" />
+                <meta name="twitter:title" content="Qingstat" />
                 <meta
                     name="twitter:description"
                     content="Scalable web analytics you run yourself on Cloudflare"
                 />
                 <meta
                     name="twitter:image"
-                    content={data.origin + "/counterscale-og-large.webp"}
+                    content={data.origin + "/Qingstat-og-large.webp"}
                 />
                 <Meta />
                 <Links />
@@ -180,8 +180,8 @@ export const Layout = ({ children = [] }: { children: React.ReactNode }) => {
                 <ScrollRestoration />
                 <Scripts />
                 <script
-                    id="counterscale-script"
-                    data-site-id="counterscale-dev"
+                    id="qingstat-script"
+                    data-site-id="Qingstat-dev"
                     src="/tracker.js"
                 ></script>
             </body>
@@ -192,10 +192,10 @@ export const Layout = ({ children = [] }: { children: React.ReactNode }) => {
 export default function App() {
     const data = useLoaderData<typeof loader>();
 
-    // Check if current domain is a subdomain of counterscale.dev
+    // Check if current domain is a subdomain of github.com/Adsryen/qingstat
     const currentOrigin = new URL(data.url).hostname;
-    const isCounterscaleSubdomain = currentOrigin.endsWith(".counterscale.dev");
-    const homeUrl = isCounterscaleSubdomain ? "https://counterscale.dev" : "/";
+    const isQingstatSubdomain = currentOrigin.endsWith(".qingstat.dev");
+    const homeUrl = isQingstatSubdomain ? "https://github.com/Adsryen/qingstat" : "/";
 
     return (
         <LocaleProvider initialLocale={data.locale}>
@@ -259,12 +259,12 @@ function AppShell({
                 <nav className="flex justify-between items-center">
                     <div className="flex items-center">
                         <a href={homeUrl} className="text-lg font-bold">
-                            Counterscale
+                            Qingstat
                         </a>
                         <img
                             className="w-6 ml-1"
                             src="/img/arrow.svg"
-                            alt="Counterscale Icon"
+                            alt="Qingstat Icon"
                         />
                     </div>
                     <div className="flex items-center gap-2">

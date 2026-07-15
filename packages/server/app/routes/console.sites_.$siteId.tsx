@@ -15,7 +15,7 @@ import { cn } from "~/lib/utils";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
     const name = data?.site?.name || data?.siteId || "Site";
-    return [{ title: `Counterscale: ${name}` }];
+    return [{ title: `Qingstat: ${name}` }];
 };
 
 export async function loader({ request, context, params }: LoaderFunctionArgs) {

@@ -14,8 +14,8 @@ import { useLocale } from "~/i18n/LocaleContext";
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "Counterscale: Login" },
-        { name: "description", content: "Sign in to Counterscale console" },
+        { title: "Qingstat: Login" },
+        { name: "description", content: "Sign in to Qingstat console" },
     ];
 };
 
@@ -68,8 +68,8 @@ export default function LoginPage() {
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-8">
             <img
-                src="/counterscale-logo.webp"
-                alt="CounterScale Logo"
+                src="/Qingstat-logo.webp"
+                alt="Qingstat Logo"
                 className="w-56 sm:w-72"
             />
             <Card className="w-full max-w-md p-8 text-center rounded-2xl shadow-sm">
