@@ -192,3 +192,101 @@ export function unavailableEntryExitSummary(): EntryExitPageSummary {
         countsByProperty: [],
     };
 }
+
+/** Path exit-rate row: [path, sessionsOnPath, exitRatePercentLabel] for TableCard. */
+export type PathExitRateRow = [path: string, sessions: number, exitRateLabel: string];
+
+export type PathExitRateSummary = {
+    available: boolean;
+    reason: "db-unavailable" | null;
+    countsByProperty: PathExitRateRow[];
+};
+
+type PathExitRateSqlRow = {
+    path: string | null;
+    sessions: number | string;
+    exits: number | string;
+};
+
+/**
+ * Per-path exit rate over pageviews in range:
+ * exits = visits whose last pageview path is this path
+ * sessions = visits that viewed this path at least once
+ * rate = exits / sessions
+ */
+export async function getPathExitRateSummary(
+    db: D1Database,
+    siteId: string,
+    range: EntryExitDateRange,
+    filters: SearchFilters = {},
+): Promise<PathExitRateSummary> {
+    const pathExpr = `COALESCE(NULLIF(TRIM(path), ''), '${UNKNOWN_PATH_LABEL}')`;
+    const pathFilterSql = filters.path ? `AND path = ?` : "";
+    const start = range.startDate.toISOString();
+    const end = range.endDate.toISOString();
+    const pathBind =
+        filters.path === UNKNOWN_PATH_LABEL
+            ? UNKNOWN_PATH_LABEL
+            : filters.path;
+
+    const result = await db
+        .prepare(
+            `WITH ranked AS (
+                SELECT
+                    visit_id,
+                    path,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY site_id, visit_id
+                        ORDER BY occurred_at DESC, created_at DESC, pageview_id DESC
+                    ) AS rn
+                FROM pageviews
+                WHERE site_id = ?
+                  AND occurred_at >= ?
+                  AND occurred_at < ?
+             ),
+             per_path AS (
+                SELECT
+                    ${pathExpr} AS path,
+                    COUNT(DISTINCT visit_id) AS sessions,
+                    COUNT(DISTINCT CASE WHEN rn = 1 THEN visit_id END) AS exits
+                FROM ranked
+                GROUP BY ${pathExpr}
+             )
+             SELECT path, sessions, exits
+             FROM per_path
+             WHERE sessions > 0
+               ${pathFilterSql}
+             ORDER BY exits DESC, sessions DESC, path ASC
+             LIMIT 10`,
+        )
+        .bind(
+            siteId,
+            start,
+            end,
+            ...(pathBind ? [pathBind] : []),
+        )
+        .all<PathExitRateSqlRow>();
+
+    const rows: PathExitRateRow[] = (result.results ?? []).map((row) => {
+        const path = normalizePath(row.path);
+        const sessions = Number(row.sessions) || 0;
+        const exits = Number(row.exits) || 0;
+        const rate =
+            sessions > 0 ? `${((exits / sessions) * 100).toFixed(1)}%` : "0%";
+        return [path, sessions, rate];
+    });
+
+    return {
+        available: true,
+        reason: null,
+        countsByProperty: rows,
+    };
+}
+
+export function unavailablePathExitRateSummary(): PathExitRateSummary {
+    return {
+        available: false,
+        reason: "db-unavailable",
+        countsByProperty: [],
+    };
+}

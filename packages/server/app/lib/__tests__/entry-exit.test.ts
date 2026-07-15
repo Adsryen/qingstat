@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import {
     getEntryPageSummary,
     getExitPageSummary,
+    getPathExitRateSummary,
     UNKNOWN_PATH_LABEL,
 } from "../entry-exit";
 
@@ -65,6 +66,16 @@ function createEntryExitD1(visits: VisitRow[], pageviews: PageviewRow[]) {
                     }
 
                     if (sql.includes("ROW_NUMBER()")) {
+                        if (sql.includes("per_path") || sql.includes("AS exits")) {
+                            const rows = summarizePathExitRate(
+                                pageviews,
+                                siteId,
+                                start,
+                                end,
+                                pathFilter,
+                            );
+                            return { results: rows as T[] };
+                        }
                         const rows = summarizeExit(
                             pageviews,
                             siteId,
@@ -167,6 +178,60 @@ function summarizeExit(
     }
 
     return Array.from(grouped.values()).sort((a, b) => b.sessions - a.sessions);
+}
+
+function summarizePathExitRate(
+    pageviews: PageviewRow[],
+    siteId: string,
+    start: string,
+    end: string,
+    pathFilter?: string,
+) {
+    const byVisit = new Map<string, PageviewRow[]>();
+    pageviews
+        .filter(
+            (pageview) =>
+                pageview.site_id === siteId &&
+                pageview.occurred_at >= start &&
+                pageview.occurred_at < end,
+        )
+        .forEach((pageview) => {
+            const rows = byVisit.get(pageview.visit_id) || [];
+            rows.push(pageview);
+            byVisit.set(pageview.visit_id, rows);
+        });
+
+    const sessionsByPath = new Map<string, Set<string>>();
+    const exitsByPath = new Map<string, Set<string>>();
+
+    for (const [visitId, rows] of byVisit.entries()) {
+        const sorted = [...rows].sort((a, b) => {
+            const occurred = b.occurred_at.localeCompare(a.occurred_at);
+            if (occurred !== 0) return occurred;
+            const created = b.created_at.localeCompare(a.created_at);
+            if (created !== 0) return created;
+            return b.pageview_id.localeCompare(a.pageview_id);
+        });
+        const lastPath = normalizePath(sorted[0].path);
+        const paths = new Set(rows.map((r) => normalizePath(r.path)));
+        for (const path of paths) {
+            if (pathFilter && path !== pathFilter) continue;
+            if (!sessionsByPath.has(path)) sessionsByPath.set(path, new Set());
+            sessionsByPath.get(path)!.add(visitId);
+        }
+        if (!pathFilter || lastPath === pathFilter) {
+            if (!exitsByPath.has(lastPath)) exitsByPath.set(lastPath, new Set());
+            exitsByPath.get(lastPath)!.add(visitId);
+        }
+    }
+
+    return Array.from(sessionsByPath.entries())
+        .map(([path, visits]) => ({
+            path,
+            sessions: visits.size,
+            exits: exitsByPath.get(path)?.size || 0,
+        }))
+        .sort((a, b) => b.exits - a.exits || b.sessions - a.sessions);
 }
 
 describe("entry/exit page summaries", () => {
@@ -299,5 +364,27 @@ describe("entry/exit page summaries", () => {
         expect(
             result.countsByProperty.every(([, sessions]) => sessions <= visits.length),
         ).toBe(true);
+    });
+
+    test("computes path exit rate as exits/sessions (not bounce)", async () => {
+        const db = createEntryExitD1(visits, pageviews);
+
+        const result = await getPathExitRateSummary(db, "site-a", range);
+        expect(result.available).toBe(true);
+        expect(result.reason).toBeNull();
+
+        // /home: viewed by single+multi (2), exit only single → 50%
+        // /pricing, /signup, (unknown): one session each and each is exit → 100%
+        // /landing: spa viewed then left for /signup → 0%
+        expect(result.countsByProperty).toEqual(
+            expect.arrayContaining([
+                ["/home", 2, "50.0%"],
+                ["/pricing", 1, "100.0%"],
+                ["/signup", 1, "100.0%"],
+                ["/landing", 1, "0.0%"],
+                [UNKNOWN_PATH_LABEL, 1, "100.0%"],
+            ]),
+        );
+        expect(result.countsByProperty).toHaveLength(5);
     });
 });

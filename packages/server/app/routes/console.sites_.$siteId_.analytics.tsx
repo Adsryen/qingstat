@@ -30,6 +30,7 @@ import { SourceTaxonomyCard } from "./resources.source-taxonomy";
 import { EntryPagesCard } from "./resources.entry-pages";
 import { ExitPagesCard } from "./resources.exit-pages";
 import { PathsCard } from "./resources.paths";
+import { PathExitRateCard } from "./resources.path-exit-rate";
 import { BrowserCard } from "./resources.browser";
 import { BrowserVersionCard } from "./resources.browserversion";
 import { CountryCard } from "./resources.country";
@@ -352,6 +353,15 @@ export default function Dashboard() {
                         timezone={userTimezone}
                     />
                     <ExitPagesCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        onFilterChange={handleFilterChange}
+                        timezone={userTimezone}
+                    />
+                </div>
+                <div className="w-full mb-4">
+                    <PathExitRateCard
                         siteId={data.siteId}
                         interval={data.interval}
                         filters={data.filters}

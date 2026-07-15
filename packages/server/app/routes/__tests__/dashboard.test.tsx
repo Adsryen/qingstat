@@ -242,6 +242,12 @@ describe("Dashboard route", () => {
                         },
                     },
                     {
+                        path: "/resources/path-exit-rate",
+                        loader: () => {
+                            return { countsByProperty: [] };
+                        },
+                    },
+                    {
                         path: "/resources/browser",
                         loader: () => {
                             return { countsByProperty: [] };
@@ -344,6 +350,7 @@ describe("Dashboard route", () => {
         expect(screen.getByText("New / returning visitors")).toBeInTheDocument();
         expect(screen.getByText("Entry Page")).toBeInTheDocument();
         expect(screen.getByText("Exit Page")).toBeInTheDocument();
+        expect(screen.getByText("Exit Rate")).toBeInTheDocument();
         expect(screen.getByText("Browser")).toBeInTheDocument();
         expect(screen.getByText("Country")).toBeInTheDocument();
         expect(screen.getByText("Device")).toBeInTheDocument();
