@@ -1,6 +1,7 @@
 {
     "main": "./workers/app.ts",
     "name": "counterscale",
+    "account_id": "ef8e0352e51348a84bdf842749cb7491",
     "compatibility_flags": [
         "nodejs_compat_v2"
     ],
