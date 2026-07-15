@@ -170,16 +170,17 @@ export function bucketScreenDimension(
     if (rounded <= min) return min;
     if (rounded >= max) return max;
 
-    let best = min;
+    let best: number = min;
     let bestDist = Math.abs(rounded - min);
     for (let i = 1; i < ladder.length; i++) {
-        const dist = Math.abs(rounded - ladder[i]);
+        const candidate = ladder[i];
+        const dist = Math.abs(rounded - candidate);
         if (dist < bestDist) {
-            best = ladder[i];
+            best = candidate;
             bestDist = dist;
-        } else if (dist === bestDist && ladder[i] < best) {
+        } else if (dist === bestDist && candidate < best) {
             // Prefer smaller bucket on exact midpoint ties
-            best = ladder[i];
+            best = candidate;
         }
     }
     return best;
