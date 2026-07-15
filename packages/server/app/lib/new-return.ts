@@ -70,6 +70,8 @@ const UNSUPPORTED_FILTER_KEYS = [
     "deviceModel",
     "browserName",
     "browserVersion",
+    "osName",
+    "browserLanguage",
     "utmSource",
     "utmMedium",
     "utmCampaign",

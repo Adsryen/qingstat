@@ -226,6 +226,8 @@ describe("collectRequestHandler", () => {
                 "California", // region
                 "San Francisco", // city
                 "CA", // regionCode
+                "Linux", // osName
+                "(unknown)", // browserLanguage — no Accept-Language header
             ],
             doubles: [
                 1, // new visitor
@@ -567,7 +569,7 @@ describe("collectRequestHandler", () => {
         const writeDataPoint = env.WEB_COUNTER_AE.writeDataPoint;
         expect(writeDataPoint).toHaveBeenCalled();
         const datapoint = (writeDataPoint as Mock).mock.calls[0][0];
-        expect(datapoint.blobs).toHaveLength(18);
+        expect(datapoint.blobs).toHaveLength(20);
         expect(datapoint.doubles).toHaveLength(5);
         expect(datapoint.blobs).not.toContain("203.0.113.10");
         expect(datapoint.blobs).not.toContain("198.51.100.20");
@@ -612,7 +614,7 @@ describe("collectRequestHandler", () => {
         expect(db._visits.get("example\u0000visit-123")?.page_count).toBe(1);
 
         const datapoint = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock.calls[0][0];
-        expect(datapoint.blobs).toHaveLength(18);
+        expect(datapoint.blobs).toHaveLength(20);
         expect(datapoint.doubles).toHaveLength(5);
         expect(datapoint.blobs).not.toContain("client-pv-123");
     });
@@ -688,4 +690,28 @@ describe("collectRequestHandler", () => {
         expect(env.WEB_COUNTER_AE.writeDataPoint).toHaveBeenCalled();
     });
 
+    test("parses OS from UA and primary language from Accept-Language", async () => {
+        const env = {
+            WEB_COUNTER_AE: {
+                writeDataPoint: vi.fn(),
+            } as AnalyticsEngineDataset,
+        } as Env;
+
+        const request = httpMocks.createRequest(
+            // @ts-expect-error - we're mocking the request object
+            generateRequestParams({
+                "user-agent":
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
+            }),
+        );
+
+        await collectRequestHandler(request as any, env);
+
+        const blobs = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock
+            .calls[0][0].blobs;
+        expect(blobs).toHaveLength(20);
+        expect(blobs[18]).toBe("Windows"); // osName
+        expect(blobs[19]).toBe("zh"); // browserLanguage primary tag
+    });
 });

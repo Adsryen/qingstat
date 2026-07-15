@@ -38,6 +38,10 @@ export const ColumnMappings = {
     city: "blob17",
     /** ISO-3166-2 region code when available (request.cf.regionCode) */
     regionCode: "blob18",
+    /** OS name from parsed User-Agent (e.g. Windows, Android) */
+    osName: "blob19",
+    /** Primary browser language from Accept-Language (e.g. en, zh) */
+    browserLanguage: "blob20",
 
     /**
      * doubles

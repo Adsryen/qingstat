@@ -37,6 +37,8 @@ import { RegionCard } from "./resources.region";
 import { CityCard } from "./resources.city";
 import { GeoMapCard } from "./resources.geo";
 import { DeviceCard } from "./resources.device";
+import { OsCard } from "./resources.os";
+import { LanguageCard } from "./resources.language";
 import { UtmSourceCard } from "./resources.utm-source";
 import { UtmMediumCard } from "./resources.utm-medium";
 import { UtmCampaignCard } from "./resources.utm-campaign";
@@ -384,6 +386,22 @@ export default function Dashboard() {
                     />
 
                     <DeviceCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        onFilterChange={handleFilterChange}
+                        timezone={userTimezone}
+                    />
+                </div>
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
+                    <OsCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        onFilterChange={handleFilterChange}
+                        timezone={userTimezone}
+                    />
+                    <LanguageCard
                         siteId={data.siteId}
                         interval={data.interval}
                         filters={data.filters}

@@ -11,6 +11,8 @@ export interface SearchFilters {
     city?: string;
     browserName?: string;
     browserVersion?: string;
+    osName?: string;
+    browserLanguage?: string;
     utmSource?: string;
     utmMedium?: string;
     utmCampaign?: string;

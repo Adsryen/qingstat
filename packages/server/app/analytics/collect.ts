@@ -137,6 +137,35 @@ function getDeviceTypeFromDevice(device: IDevice): string {
     return device.type === undefined ? "desktop" : device.type;
 }
 
+const UNKNOWN_DIMENSION = "(unknown)";
+const MAX_OS_NAME_LENGTH = 64;
+const MAX_BROWSER_LANGUAGE_LENGTH = 16;
+
+/** Normalize OS name from ua-parser; empty → (unknown). */
+export function normalizeOsName(name: string | undefined | null): string {
+    const trimmed = (name ?? "").trim();
+    if (!trimmed) return UNKNOWN_DIMENSION;
+    return trimmed.slice(0, MAX_OS_NAME_LENGTH);
+}
+
+/**
+ * Primary language from Accept-Language (e.g. "zh-CN,zh;q=0.9" → "zh").
+ * Empty / unparsable → (unknown).
+ */
+export function parsePrimaryBrowserLanguage(
+    acceptLanguage: string | null | undefined,
+): string {
+    if (!acceptLanguage) return UNKNOWN_DIMENSION;
+    const first = acceptLanguage.split(",")[0]?.trim();
+    if (!first) return UNKNOWN_DIMENSION;
+    // Drop quality / extensions: "en-US;q=0.9" → "en-US" → primary "en"
+    const tag = first.split(";")[0]?.trim().toLowerCase();
+    if (!tag) return UNKNOWN_DIMENSION;
+    const primary = tag.split("-")[0]?.trim();
+    if (!primary || !/^[a-z]{2,8}$/.test(primary)) return UNKNOWN_DIMENSION;
+    return primary.slice(0, MAX_BROWSER_LANGUAGE_LENGTH);
+}
+
 /** Cloudflare edge geolocation fields we persist (never raw client IP). */
 export type CollectGeoExtra = {
     country?: unknown;
@@ -331,6 +360,10 @@ export async function collectRequestHandler(
         browserVersion: browserVersion,
         deviceModel: parsedUserAgent.getDevice().model,
         deviceType: getDeviceTypeFromDevice(parsedUserAgent.getDevice()),
+        osName: normalizeOsName(parsedUserAgent.getOS().name),
+        browserLanguage: parsePrimaryBrowserLanguage(
+            request.headers.get("accept-language"),
+        ),
         // UTM parameters
         utmSource: params.us,
         utmMedium: params.um,
@@ -434,6 +467,8 @@ interface DataPoint {
     browserVersion?: string;
     deviceModel?: string;
     deviceType?: string;
+    osName?: string;
+    browserLanguage?: string;
     utmSource?: string;
     utmMedium?: string;
     utmCampaign?: string;
@@ -483,6 +518,9 @@ export function writeDataPoint(
             data.region || "", // blob16
             data.city || "", // blob17
             data.regionCode || "", // blob18
+            // Prefer normalized "(unknown)"; empty still allowed for pre-field rows
+            data.osName || UNKNOWN_DIMENSION, // blob19
+            data.browserLanguage || UNKNOWN_DIMENSION, // blob20
         ],
         doubles: [
             data.newVisitor || 0,

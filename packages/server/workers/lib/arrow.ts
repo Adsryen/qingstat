@@ -45,7 +45,8 @@ export const METRICS_V1_ROLLUP_SPECS = [
     },
     {
         id: "geo-device-top",
-        description: "Administrative geography and device/browser dimensions.",
+        description:
+            "Administrative geography, device/browser, OS and language dimensions.",
         dimensions: [
             "country",
             "region",
@@ -53,8 +54,10 @@ export const METRICS_V1_ROLLUP_SPECS = [
             "regionCode",
             "browserName",
             "deviceType",
+            "osName",
+            "browserLanguage",
         ],
-        maxExpectedGroupsPerSite: 2000,
+        maxExpectedGroupsPerSite: 5000,
     },
 ] as const satisfies readonly MetricsRollupSpec[];
 

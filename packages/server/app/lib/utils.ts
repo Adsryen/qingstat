@@ -53,6 +53,12 @@ export function getFiltersFromSearchParams(searchParams: URLSearchParams) {
     if (searchParams.has("browserVersion")) {
         filters.browserVersion = searchParams.get("browserVersion") || "";
     }
+    if (searchParams.has("osName")) {
+        filters.osName = searchParams.get("osName") || "";
+    }
+    if (searchParams.has("browserLanguage")) {
+        filters.browserLanguage = searchParams.get("browserLanguage") || "";
+    }
     if (searchParams.has("utmSource")) {
         filters.utmSource = searchParams.get("utmSource") || "";
     }

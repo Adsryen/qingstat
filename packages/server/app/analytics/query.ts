@@ -159,6 +159,8 @@ function filtersToSql(filters: SearchFilters) {
         "region",
         "city",
         "deviceType",
+        "osName",
+        "browserLanguage",
         "utmSource",
         "utmMedium",
         "utmCampaign",
@@ -951,6 +953,40 @@ export class AnalyticsEngineAPI {
         return this.getVisitorCountByColumn(
             siteId,
             "deviceType",
+            interval,
+            tz,
+            filters,
+            page,
+        );
+    }
+
+    async getCountByOs(
+        siteId: string,
+        interval: string,
+        tz?: string,
+        filters: SearchFilters = {},
+        page: number = 1,
+    ): Promise<[osName: string, visitors: number][]> {
+        return this.getVisitorCountByColumn(
+            siteId,
+            "osName",
+            interval,
+            tz,
+            filters,
+            page,
+        );
+    }
+
+    async getCountByBrowserLanguage(
+        siteId: string,
+        interval: string,
+        tz?: string,
+        filters: SearchFilters = {},
+        page: number = 1,
+    ): Promise<[browserLanguage: string, visitors: number][]> {
+        return this.getVisitorCountByColumn(
+            siteId,
+            "browserLanguage",
             interval,
             tz,
             filters,

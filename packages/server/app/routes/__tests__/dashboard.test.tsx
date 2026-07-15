@@ -278,6 +278,18 @@ describe("Dashboard route", () => {
                         },
                     },
                     {
+                        path: "/resources/os",
+                        loader: () => {
+                            return { countsByProperty: [] };
+                        },
+                    },
+                    {
+                        path: "/resources/language",
+                        loader: () => {
+                            return { countsByProperty: [] };
+                        },
+                    },
+                    {
                         path: "/resources/browserversion",
                         loader: () => {
                             return { countsByProperty: [] };
@@ -329,6 +341,8 @@ describe("Dashboard route", () => {
         expect(screen.getByText("Browser")).toBeInTheDocument();
         expect(screen.getByText("Country")).toBeInTheDocument();
         expect(screen.getByText("Device")).toBeInTheDocument();
+        expect(screen.getByText("OS")).toBeInTheDocument();
+        expect(screen.getByText("Language")).toBeInTheDocument();
         expect(screen.getByText("UTM Source")).toBeInTheDocument();
         expect(screen.getByText("UTM Medium")).toBeInTheDocument();
         expect(screen.getByText("UTM Campaign")).toBeInTheDocument();
@@ -500,6 +514,28 @@ describe("Dashboard route", () => {
                                     ["Desktop", 100],
                                     ["Mobile", 80],
                                     ["Tablet", 60],
+                                ],
+                            };
+                        },
+                    },
+                    {
+                        path: "/resources/os",
+                        loader: () => {
+                            return {
+                                countsByProperty: [
+                                    ["Windows", 100],
+                                    ["Android", 80],
+                                ],
+                            };
+                        },
+                    },
+                    {
+                        path: "/resources/language",
+                        loader: () => {
+                            return {
+                                countsByProperty: [
+                                    ["en", 100],
+                                    ["zh", 80],
                                 ],
                             };
                         },

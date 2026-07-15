@@ -61,6 +61,17 @@ describe("getFiltersFromSearchParams", () => {
             browserName: "chrome",
         });
     });
+
+    test("it should handle osName and browserLanguage filters", () => {
+        const searchParams = new URLSearchParams(
+            "?osName=Windows&browserLanguage=zh&path=/",
+        );
+        expect(getFiltersFromSearchParams(searchParams)).toEqual({
+            osName: "Windows",
+            browserLanguage: "zh",
+            path: "/",
+        });
+    });
 });
 
 describe("getDateTimeRange", () => {

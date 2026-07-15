@@ -43,8 +43,12 @@ describe("metricsDataset v1 field registry", () => {
             expect(field?.status).not.toBe("reserved");
         });
 
-        expect(getMetricsV1FieldBySlot("blob19")?.status).toBe("reserved");
-        expect(getMetricsV1FieldBySlot("blob20")?.status).toBe("reserved");
+        expect(getMetricsV1FieldBySlot("blob19")?.status).toBe("used");
+        expect(getMetricsV1FieldBySlot("blob19")?.logicalName).toBe("osName");
+        expect(getMetricsV1FieldBySlot("blob20")?.status).toBe("used");
+        expect(getMetricsV1FieldBySlot("blob20")?.logicalName).toBe(
+            "browserLanguage",
+        );
     });
 
     test("documents legacy visitor/session/bounce semantics as non-reusable", () => {
