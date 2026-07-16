@@ -823,4 +823,123 @@ describe("collectRequestHandler", () => {
         expect(doubles[7]).toBe(0);
     });
 
+    test("rejects collect when registry site is disabled", async () => {
+        const env = {
+            WEB_COUNTER_AE: {
+                writeDataPoint: vi.fn(),
+            } as AnalyticsEngineDataset,
+            DB: {
+                prepare(sql: string) {
+                    return {
+                        bind() {
+                            return this;
+                        },
+                        async first() {
+                            if (sql.includes("FROM sites")) {
+                                return {
+                                    site_id: "example",
+                                    name: "Example",
+                                    enabled: 0,
+                                    public_stats: 1,
+                                    record_ip: 1,
+                                    ip_retention_days: 60,
+                                    allowed_hosts: null,
+                                    created_at: "2024-01-01T00:00:00.000Z",
+                                    updated_at: "2024-01-01T00:00:00.000Z",
+                                };
+                            }
+                            return null;
+                        },
+                        async all() {
+                            return { results: [] };
+                        },
+                        async run() {
+                            return { meta: { changes: 0 } };
+                        },
+                    };
+                },
+            } as unknown as D1Database,
+        } as Env;
+        // @ts-expect-error mock
+        const request = httpMocks.createRequest(defaultRequestParams);
+        const response = await collectRequestHandler(request as any, env);
+        expect(response.status).toBe(403);
+        expect(await response.text()).toMatch(/disabled/i);
+        expect(env.WEB_COUNTER_AE.writeDataPoint).not.toHaveBeenCalled();
+    });
+
+    test("rejects collect when host not on allowlist", async () => {
+        const env = {
+            WEB_COUNTER_AE: {
+                writeDataPoint: vi.fn(),
+            } as AnalyticsEngineDataset,
+            DB: {
+                prepare(sql: string) {
+                    return {
+                        bind() {
+                            return this;
+                        },
+                        async first() {
+                            if (sql.includes("FROM sites")) {
+                                return {
+                                    site_id: "example",
+                                    name: "Example",
+                                    enabled: 1,
+                                    public_stats: 1,
+                                    record_ip: 1,
+                                    ip_retention_days: 60,
+                                    allowed_hosts: "allowed.example",
+                                    created_at: "2024-01-01T00:00:00.000Z",
+                                    updated_at: "2024-01-01T00:00:00.000Z",
+                                };
+                            }
+                            return null;
+                        },
+                        async all() {
+                            return { results: [] };
+                        },
+                        async run() {
+                            return { meta: { changes: 0 } };
+                        },
+                    };
+                },
+            } as unknown as D1Database,
+        } as Env;
+        // @ts-expect-error mock
+        const request = httpMocks.createRequest(defaultRequestParams);
+        const response = await collectRequestHandler(request as any, env);
+        expect(response.status).toBe(403);
+        expect(await response.text()).toMatch(/host/i);
+        expect(env.WEB_COUNTER_AE.writeDataPoint).not.toHaveBeenCalled();
+    });
+
+    test("strips tracking query params from path before write", async () => {
+        const env = {
+            WEB_COUNTER_AE: {
+                writeDataPoint: vi.fn(),
+            } as AnalyticsEngineDataset,
+        } as Env;
+        const request = generateRequestParams({
+            "user-agent":
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36",
+        });
+        request.url =
+            "https://example.com/user/42?" +
+            new URLSearchParams({
+                sid: "example",
+                h: "example.com",
+                p: "/landing?utm_source=google&page=2&fbclid=abc",
+                r: "https://google.com",
+                nv: "1",
+                ns: "1",
+            }).toString();
+        // @ts-expect-error mock
+        await collectRequestHandler(request as any, env);
+        expect(env.WEB_COUNTER_AE.writeDataPoint).toHaveBeenCalled();
+        const blobs = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock.calls[0][0]
+            .blobs;
+        expect(blobs[2]).toBe("/landing?page=2");
+    });
+
+
 });

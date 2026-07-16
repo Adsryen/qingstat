@@ -9,6 +9,7 @@ import {
     visitExists,
 } from "~/lib/visit-details";
 import { botScoreFromUserAgent } from "./bot-filter";
+import { applyCollectTrafficRules } from "~/lib/traffic-rules";
 
 // Cookieless visitor/session tracking
 // Uses the approach described here: https://notes.normally.com/cookieless-unique-visitor-counts/
@@ -344,6 +345,39 @@ export async function collectRequestHandler(
     const siteId = params.sid;
     if (!siteId || siteId === "") {
         return new Response("Missing siteId", { status: 400 });
+    }
+
+    // Site enable + host allowlist + path query stripping (traffic rules v1)
+    if (env.DB) {
+        const siteRow = await getSite(env.DB, siteId);
+        if (siteRow) {
+            const decision = applyCollectTrafficRules({
+                siteEnabled: siteRow.enabled,
+                allowedHosts: siteRow.allowedHosts,
+                host: params.h,
+                path: params.p,
+            });
+            if (!decision.ok) {
+                return new Response(decision.message, {
+                    status: decision.status,
+                });
+            }
+            params.h = decision.host;
+            params.p = decision.path;
+        } else {
+            // Unregistered siteId: still strip tracking params (no host allowlist)
+            const cleaned = applyCollectTrafficRules({
+                path: params.p,
+            });
+            if (cleaned.ok) {
+                params.p = cleaned.path;
+            }
+        }
+    } else {
+        const cleaned = applyCollectTrafficRules({ path: params.p });
+        if (cleaned.ok) {
+            params.p = cleaned.path;
+        }
     }
 
     const identityParams = parseCollectIdentityParams(params);
