@@ -15,6 +15,7 @@ import * as build from "../build/server";
 import { extractAsArrow } from "./lib/arrow";
 import { deleteExpiredVisitDetails } from "../app/lib/visit-details";
 import { getSite } from "../app/lib/sites";
+import { runAlertEvaluation } from "../app/lib/alert-runner";
 import { SitePresence } from "./presence";
 
 export { SitePresence };
@@ -86,12 +87,29 @@ async function handlePresenceRequest(request: Request, env: Env): Promise<Respon
 
 
 export default {
-        async scheduled(
-        _controller: ScheduledController,
+    async scheduled(
+        controller: ScheduledController,
         env: Env,
         ctx: ExecutionContext,
     ) {
         try {
+            // Hourly alert evaluation (minute 20 of each hour)
+            if (controller.cron === "20 * * * *") {
+                if (env.DB) {
+                    ctx.waitUntil(
+                        runAlertEvaluation({
+                            DB: env.DB,
+                            CF_ACCOUNT_ID: env.CF_ACCOUNT_ID,
+                            CF_BEARER_TOKEN: env.CF_BEARER_TOKEN,
+                        }).catch((error) => {
+                            console.error("alert evaluation failed", error);
+                        }),
+                    );
+                }
+                return;
+            }
+
+            // Daily rollup + visit expiry (default: 0 2 * * *)
             if (env.CF_STORAGE_ENABLED !== "false") {
                 ctx.waitUntil(
                     extractAsArrow(

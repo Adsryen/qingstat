@@ -201,6 +201,15 @@ export default function ConsoleSiteHub() {
                         >
                             Funnels
                         </a>
+                        <a
+                            href={`/console/sites/${encodeURIComponent(siteId)}/alerts`}
+                            className={cn(
+                                buttonVariants({ variant: "outline" }),
+                                "rounded-xl",
+                            )}
+                        >
+                            Alerts
+                        </a>
                     </CardContent>
                 </Card>
             </div>
