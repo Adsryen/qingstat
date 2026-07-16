@@ -332,6 +332,19 @@ describe("Dashboard route", () => {
                         },
                     },
                     {
+                        path: "/resources/performance",
+                        loader: () => ({
+                            samples: 0,
+                            avgTtfbMs: null,
+                            avgLcpMs: null,
+                        }),
+                    },
+                    {
+                        path: "/resources/errors",
+                        loader: () => ({ countsByProperty: [] }),
+                    },
+
+                    {
                         path: "/resources/resolution",
                         loader: () => {
                             return { countsByProperty: [] };
@@ -635,6 +648,19 @@ describe("Dashboard route", () => {
                             };
                         },
                     },
+                    {
+                        path: "/resources/performance",
+                        loader: () => ({
+                            samples: 0,
+                            avgTtfbMs: null,
+                            avgLcpMs: null,
+                        }),
+                    },
+                    {
+                        path: "/resources/errors",
+                        loader: () => ({ countsByProperty: [] }),
+                    },
+
                     {
                         path: "/resources/resolution",
                         loader: () => {
