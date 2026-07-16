@@ -214,7 +214,7 @@ describe("collectRequestHandler", () => {
                 "US", // country
                 "https://google.com", // referrer
                 "Chrome", // browser name
-                "",
+                "(unknown)",
                 "example", // site id
                 "51.x.x.x", // browser version
                 "desktop", // device type
