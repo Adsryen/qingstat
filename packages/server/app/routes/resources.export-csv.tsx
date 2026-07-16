@@ -328,7 +328,7 @@ export function ExportCsvControl({
             timezone,
             report,
         });
-        Object.entries(filters).forEach(([key, value]) => {
+        Object.entries(filters ?? {}).forEach(([key, value]) => {
             if (value !== undefined && value !== "") {
                 params.set(key, String(value));
             }

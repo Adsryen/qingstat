@@ -169,6 +169,8 @@ describe("Dashboard route", () => {
                 siteId: "@unknown",
                 sites: [],
                 intervalType: "day",
+                interval: "7d",
+                filters: {},
             };
         }
 
@@ -374,10 +376,35 @@ describe("Dashboard route", () => {
                         path: "/resources/funnels",
                         loader: () => ({ available: true, results: [] }),
                     },
-
-
-
-
+                    {
+                        path: "/resources/attribution",
+                        loader: () => ({
+                            available: false,
+                            goals: [],
+                            selectedGoalId: "",
+                            dimension: "sourceType",
+                            rows: [],
+                            totalCompletions: 0,
+                            displayedCompletions: 0,
+                            truncated: false,
+                            modelNote: "",
+                        }),
+                    },
+                    {
+                        path: "/resources/path-flow",
+                        loader: () => ({
+                            available: true,
+                            result: {
+                                edges: [],
+                                nodes: [],
+                                otherLabel: "(other)",
+                                scannedVisits: 0,
+                                scannedPageviews: 0,
+                                truncated: false,
+                                note: "",
+                            },
+                        }),
+                    },
                     {
                         path: "/resources/resolution",
                         loader: () => {
@@ -436,6 +463,7 @@ describe("Dashboard route", () => {
         expect(screen.getByText("Entry Page")).toBeInTheDocument();
         expect(screen.getByText("Exit Page")).toBeInTheDocument();
         expect(screen.getByText("Exit Rate")).toBeInTheDocument();
+        expect(screen.getByText("Path Flow")).toBeInTheDocument();
         expect(screen.getByText("Browser")).toBeInTheDocument();
         expect(screen.getByText("Country")).toBeInTheDocument();
         expect(screen.getByText("Device")).toBeInTheDocument();
@@ -718,10 +746,44 @@ describe("Dashboard route", () => {
                         path: "/resources/funnels",
                         loader: () => ({ available: true, results: [] }),
                     },
-
-
-
-
+                    {
+                        path: "/resources/attribution",
+                        loader: () => ({
+                            available: false,
+                            goals: [],
+                            selectedGoalId: "",
+                            dimension: "sourceType",
+                            rows: [],
+                            totalCompletions: 0,
+                            displayedCompletions: 0,
+                            truncated: false,
+                            modelNote: "",
+                        }),
+                    },
+                    {
+                        path: "/resources/path-flow",
+                        loader: () => ({
+                            available: true,
+                            result: {
+                                edges: [
+                                    {
+                                        from: "/home",
+                                        to: "/pricing",
+                                        visits: 4,
+                                    },
+                                ],
+                                nodes: [
+                                    { path: "/home", visits: 4 },
+                                    { path: "/pricing", visits: 4 },
+                                ],
+                                otherLabel: "(other)",
+                                scannedVisits: 4,
+                                scannedPageviews: 10,
+                                truncated: false,
+                                note: "caps note",
+                            },
+                        }),
+                    },
                     {
                         path: "/resources/resolution",
                         loader: () => {
