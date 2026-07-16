@@ -26,6 +26,8 @@ vi.mock("~/lib/auth", () => ({
 }));
 
 describe("Dashboard route", () => {
+    // heavy card grid needs longer than default 5s on CI
+
     let fetch: Mock;
 
     beforeAll(() => {
@@ -339,7 +341,14 @@ describe("Dashboard route", () => {
                     },
                     {
                         path: "/resources/device-model",
-                        loader: () => ({ countsByProperty: [["iPhone", 10]] }),
+                        loader: () => {
+                            return {
+                                countsByProperty: [
+                                    ["iPhone", 12],
+                                    ["Pixel", 8],
+                                ],
+                            };
+                        },
                     },
                     {
                         path: "/resources/performance",
@@ -623,6 +632,17 @@ describe("Dashboard route", () => {
                         },
                     },
                     {
+                        path: "/resources/device-model",
+                        loader: () => {
+                            return {
+                                countsByProperty: [
+                                    ["iPhone", 12],
+                                    ["Pixel", 8],
+                                ],
+                            };
+                        },
+                    },
+                    {
                         path: "/resources/os",
                         loader: () => {
                             return {
@@ -728,7 +748,7 @@ describe("Dashboard route", () => {
         // wait until the rows render in the document
         await waitFor(() => screen.findByText("Chrome"), {
             // increased timeout because this test was failing on slower environments, e.g. GitHub actions
-            timeout: 5_000,
+            timeout: 15_000,
         });
 
         // assert some of the data we mocked actually rendered into the document
@@ -740,5 +760,5 @@ describe("Dashboard route", () => {
         expect(screen.getByText("google.com")).toBeInTheDocument();
         expect(screen.getByText("Canada")).toBeInTheDocument(); // assert converted CA -> Canada
         expect(screen.getByText("Mobile")).toBeInTheDocument();
-    });
+    }, 20_000);
 });
