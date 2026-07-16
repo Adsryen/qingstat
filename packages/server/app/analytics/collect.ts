@@ -189,6 +189,13 @@ export function bucketScreenDimension(
 }
 
 /** Normalize OS name from ua-parser; empty → (unknown). */
+export function normalizeDeviceModel(
+    model: string | undefined | null,
+): string {
+    const trimmed = (model ?? "").trim();
+    return trimmed || UNKNOWN_DIMENSION;
+}
+
 export function normalizeOsName(name: string | undefined | null): string {
     const trimmed = (name ?? "").trim();
     if (!trimmed) return UNKNOWN_DIMENSION;
@@ -438,7 +445,7 @@ export async function collectRequestHandler(
         userAgent: userAgent,
         browserName: parsedUserAgent.getBrowser().name,
         browserVersion: browserVersion,
-        deviceModel: parsedUserAgent.getDevice().model,
+        deviceModel: normalizeDeviceModel(parsedUserAgent.getDevice().model),
         deviceType: getDeviceTypeFromDevice(parsedUserAgent.getDevice()),
         osName: normalizeOsName(parsedUserAgent.getOS().name),
         browserLanguage: parsePrimaryBrowserLanguage(
@@ -632,7 +639,7 @@ export function writeDataPoint(
             data.country || "", // blob4
             data.referrer || "", // blob5
             data.browserName || "", // blob6
-            data.deviceModel || "", // blob7
+            data.deviceModel || UNKNOWN_DIMENSION, // blob7
             data.siteId || "", // blob8
             data.browserVersion || "", // blob9
             data.deviceType || "", // blob10

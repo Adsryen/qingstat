@@ -40,6 +40,7 @@ import { RegionCard } from "./resources.region";
 import { CityCard } from "./resources.city";
 import { GeoMapCard } from "./resources.geo";
 import { DeviceCard } from "./resources.device";
+import { DeviceModelCard } from "./resources.device-model";
 import { OsCard } from "./resources.os";
 import { LanguageCard } from "./resources.language";
 import { ResolutionCard } from "./resources.resolution";
@@ -470,6 +471,13 @@ export default function Dashboard() {
                     />
 
                     <DeviceCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        onFilterChange={handleFilterChange}
+                        timezone={userTimezone}
+                    />
+                    <DeviceModelCard
                         siteId={data.siteId}
                         interval={data.interval}
                         filters={data.filters}

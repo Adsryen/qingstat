@@ -305,6 +305,12 @@ describe("Dashboard route", () => {
                         },
                     },
                     {
+                        path: "/resources/device-model",
+                        loader: () => {
+                            return { countsByProperty: [] };
+                        },
+                    },
+                    {
                         path: "/resources/os",
                         loader: () => {
                             return { countsByProperty: [] };
@@ -330,6 +336,10 @@ describe("Dashboard route", () => {
                                 note: "",
                             };
                         },
+                    },
+                    {
+                        path: "/resources/device-model",
+                        loader: () => ({ countsByProperty: [["iPhone", 10]] }),
                     },
                     {
                         path: "/resources/performance",

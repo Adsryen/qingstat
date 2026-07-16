@@ -38,6 +38,9 @@ export function getFiltersFromSearchParams(searchParams: URLSearchParams) {
     if (searchParams.has("deviceType")) {
         filters.deviceType = searchParams.get("deviceType") || "";
     }
+    if (searchParams.has("deviceModel")) {
+        filters.deviceModel = searchParams.get("deviceModel") || "";
+    }
     if (searchParams.has("country")) {
         filters.country = searchParams.get("country") || "";
     }
