@@ -933,7 +933,6 @@ describe("collectRequestHandler", () => {
                 nv: "1",
                 ns: "1",
             }).toString();
-        // @ts-expect-error mock
         await collectRequestHandler(request as any, env);
         expect(env.WEB_COUNTER_AE.writeDataPoint).toHaveBeenCalled();
         const blobs = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock.calls[0][0]
