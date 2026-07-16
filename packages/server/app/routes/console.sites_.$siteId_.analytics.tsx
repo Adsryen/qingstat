@@ -69,6 +69,7 @@ import { EventsCard } from "./resources.events";
 import { GoalsCard } from "./resources.goals";
 import { FunnelsCard } from "./resources.funnels";
 import { AttributionCard } from "./resources.attribution";
+import { ExportCsvControl } from "./resources.export-csv";
 import { requireAuth } from "~/lib/auth";
 import { useLocale } from "~/i18n/LocaleContext";
 
@@ -295,6 +296,15 @@ export default function Dashboard() {
                             onFilterDelete={handleFilterDelete}
                         />
                     </div>
+                </div>
+
+                <div className="basis-auto ml-auto">
+                    <ExportCsvControl
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        timezone={userTimezone}
+                    />
                 </div>
             </FilterBar>
 

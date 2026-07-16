@@ -886,6 +886,7 @@ export class AnalyticsEngineAPI {
         tz?: string,
         filters: SearchFilters = {},
         page: number = 1,
+        limit: number = 10,
     ): Promise<[path: string, visitors: number, views: number][]> {
         const allCountsResultPromise = this.getAllCountsByColumn(
             siteId,
@@ -894,6 +895,7 @@ export class AnalyticsEngineAPI {
             tz,
             filters,
             page,
+            limit,
         );
 
         return allCountsResultPromise.then((allCountsResult) => {
@@ -913,6 +915,7 @@ export class AnalyticsEngineAPI {
         tz?: string,
         filters: SearchFilters = {},
         page: number = 1,
+        limit: number = 10,
     ): Promise<[country: string, visitors: number][]> {
         return this.getVisitorCountByColumn(
             siteId,
@@ -921,6 +924,7 @@ export class AnalyticsEngineAPI {
             tz,
             filters,
             page,
+            limit,
         );
     }
 
@@ -930,6 +934,7 @@ export class AnalyticsEngineAPI {
         tz?: string,
         filters: SearchFilters = {},
         page: number = 1,
+        limit: number = 10,
     ): Promise<[referrer: string, visitors: number, views: number][]> {
         const allCountsResultPromise = this.getAllCountsByColumn(
             siteId,
@@ -938,6 +943,7 @@ export class AnalyticsEngineAPI {
             tz,
             filters,
             page,
+            limit,
         );
 
         return allCountsResultPromise.then((allCountsResult) => {
@@ -957,6 +963,7 @@ export class AnalyticsEngineAPI {
         tz?: string,
         filters: SearchFilters = {},
         page: number = 1,
+        limit: number = 10,
     ): Promise<[browser: string, visitors: number][]> {
         return this.getVisitorCountByColumn(
             siteId,
@@ -965,6 +972,7 @@ export class AnalyticsEngineAPI {
             tz,
             filters,
             page,
+            limit,
         );
     }
 
@@ -1008,6 +1016,7 @@ export class AnalyticsEngineAPI {
         tz?: string,
         filters: SearchFilters = {},
         page: number = 1,
+        limit: number = 10,
     ): Promise<[deviceType: string, visitors: number][]> {
         return this.getVisitorCountByColumn(
             siteId,
@@ -1016,6 +1025,7 @@ export class AnalyticsEngineAPI {
             tz,
             filters,
             page,
+            limit,
         );
     }
 
@@ -1122,6 +1132,7 @@ export class AnalyticsEngineAPI {
         tz?: string,
         filters: SearchFilters = {},
         page: number = 1,
+        limit: number = 10,
     ): Promise<[utmSource: string, visitors: number][]> {
         return this.getVisitorCountByColumn(
             siteId,
@@ -1130,6 +1141,7 @@ export class AnalyticsEngineAPI {
             tz,
             filters,
             page,
+            limit,
         );
     }
 
