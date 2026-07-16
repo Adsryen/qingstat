@@ -2,8 +2,10 @@ import { useFetcher } from "react-router";
 import { useEffect } from "react";
 import type { LoaderFunctionArgs } from "react-router";
 import { Card } from "~/components/ui/card";
-import { requireAuth } from "~/lib/auth";
-import { listGoals, computeGoalCompletions } from "~/lib/goals";
+import {
+    listGoals,
+    computeGoalCompletions,
+} from "~/lib/goals";
 import { getFiltersFromSearchParams, paramsFromUrl } from "~/lib/utils";
 import type { SearchFilters } from "~/lib/types";
 import { assertCanViewSiteStats } from "~/lib/siteAccess";
