@@ -210,6 +210,15 @@ export default function ConsoleSiteHub() {
                         >
                             Alerts
                         </a>
+                        <a
+                            href={`/console/sites/${encodeURIComponent(siteId)}/api-tokens`}
+                            className={cn(
+                                buttonVariants({ variant: "outline" }),
+                                "rounded-xl",
+                            )}
+                        >
+                            API
+                        </a>
                     </CardContent>
                 </Card>
             </div>
