@@ -68,6 +68,7 @@ import { ErrorsCard } from "./resources.errors";
 import { EventsCard } from "./resources.events";
 import { GoalsCard } from "./resources.goals";
 import { FunnelsCard } from "./resources.funnels";
+import { AttributionCard } from "./resources.attribution";
 import { requireAuth } from "~/lib/auth";
 import { useLocale } from "~/i18n/LocaleContext";
 
@@ -354,6 +355,14 @@ export default function Dashboard() {
                 </div>
                 <div className="w-full mb-4">
                     <FunnelsCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        timezone={userTimezone}
+                    />
+                </div>
+                <div className="w-full mb-4">
+                    <AttributionCard
                         siteId={data.siteId}
                         interval={data.interval}
                         filters={data.filters}

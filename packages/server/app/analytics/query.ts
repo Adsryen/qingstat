@@ -1857,4 +1857,155 @@ export class AnalyticsEngineAPI {
         });
     }
 
+    /**
+     * Raw AE groups for conversion attribution (last-touch on conversion hit).
+     * pageview mode: errorEvent = 0 OR NULL
+     * event mode: errorEvent = 2
+     * Does not use filtersToSql (which always excludes errorEvent=2).
+     */
+    async getGoalAttributionRawHits(
+        siteId: string,
+        interval: string,
+        tz?: string,
+        filters: SearchFilters = {},
+        opts: {
+            mode: "pageview" | "event";
+            limit?: number;
+        } = { mode: "pageview" },
+    ): Promise<
+        Array<{
+            path: string;
+            referrer: string;
+            utmSource: string;
+            utmMedium: string;
+            utmCampaign: string;
+            utmTerm: string;
+            utmContent: string;
+            deviceType: string;
+            country: string;
+            count: number;
+        }>
+    > {
+        const { startIntervalSql, endIntervalSql } = intervalToSql(interval, tz);
+        const limit = opts.limit ?? 2000;
+        let filterStr = "";
+
+        // Equality filters (same columns as filtersToSql, without errorEvent clause).
+        // Event mode: skip utmContent filter — blob15 holds props JSON, not UTM content.
+        const equalityKeys = [
+            "path",
+            "referrer",
+            "browserName",
+            "browserVersion",
+            "country",
+            "region",
+            "city",
+            "deviceType",
+            "osName",
+            "browserLanguage",
+            "utmSource",
+            "utmMedium",
+            "utmCampaign",
+            "utmTerm",
+            "utmContent",
+        ] as const;
+        for (const key of equalityKeys) {
+            if (opts.mode === "event" && key === "utmContent") continue;
+            const value = filters[key as keyof SearchFilters];
+            if (typeof value === "string" && value !== "") {
+                filterStr += ` AND ${ColumnMappings[key]} = '${value}'`;
+            }
+        }
+
+        // Match filtersToSql composite screenResolution handling
+        if (Object.hasOwnProperty.call(filters, "screenResolution")) {
+            const parsed = parseScreenResolutionFilter(filters.screenResolution);
+            if (parsed) {
+                filterStr += ` AND ${ColumnMappings.screenWidth} = ${parsed.width}`;
+                filterStr += ` AND ${ColumnMappings.screenHeight} = ${parsed.height}`;
+            }
+        }
+
+        const botMode = filters.botTraffic ?? "exclude";
+        if (botMode === "exclude") {
+            filterStr += ` AND (${ColumnMappings.botScore} = 0 OR ${ColumnMappings.botScore} IS NULL)`;
+        } else if (botMode === "only") {
+            filterStr += ` AND ${ColumnMappings.botScore} = 1`;
+        }
+
+        const errorEventClause =
+            opts.mode === "event"
+                ? `AND ${ColumnMappings.errorEvent} = 2`
+                : `AND (${ColumnMappings.errorEvent} = 0 OR ${ColumnMappings.errorEvent} IS NULL)`;
+
+        // Event props live in utmContent; grouping by them would explode cardinality
+        // and burn the raw-group LIMIT. Aggregate without utmContent in event mode.
+        const utmContentSelect =
+            opts.mode === "event"
+                ? `'' as utmContent`
+                : `${ColumnMappings.utmContent} as utmContent`;
+        const utmContentGroup =
+            opts.mode === "event" ? "" : `,\n                ${ColumnMappings.utmContent}`;
+
+        const query = `
+            SELECT
+                ${ColumnMappings.path} as path,
+                ${ColumnMappings.referrer} as referrer,
+                ${ColumnMappings.utmSource} as utmSource,
+                ${ColumnMappings.utmMedium} as utmMedium,
+                ${ColumnMappings.utmCampaign} as utmCampaign,
+                ${ColumnMappings.utmTerm} as utmTerm,
+                ${utmContentSelect},
+                ${ColumnMappings.deviceType} as deviceType,
+                ${ColumnMappings.country} as country,
+                SUM(_sample_interval) as count
+            FROM metricsDataset
+            WHERE timestamp >= ${startIntervalSql} AND timestamp < ${endIntervalSql}
+                AND ${ColumnMappings.siteId} = '${siteId}'
+                ${errorEventClause}
+                ${filterStr}
+            GROUP BY
+                ${ColumnMappings.path},
+                ${ColumnMappings.referrer},
+                ${ColumnMappings.utmSource},
+                ${ColumnMappings.utmMedium},
+                ${ColumnMappings.utmCampaign},
+                ${ColumnMappings.utmTerm}${utmContentGroup},
+                ${ColumnMappings.deviceType},
+                ${ColumnMappings.country}
+            ORDER BY count DESC
+            LIMIT ${limit}`;
+
+        type SelectionSet = {
+            path: string;
+            referrer: string;
+            utmSource: string;
+            utmMedium: string;
+            utmCampaign: string;
+            utmTerm: string;
+            utmContent: string;
+            deviceType: string;
+            country: string;
+            count: number;
+        };
+
+        const response = await this.query(query);
+        if (!response.ok) throw new Error(response.statusText);
+        const responseData =
+            (await response.json()) as AnalyticsQueryResult<SelectionSet>;
+        return responseData.data.map((row) => ({
+            path: row.path || "",
+            referrer: row.referrer || "",
+            utmSource: row.utmSource || "",
+            utmMedium: row.utmMedium || "",
+            utmCampaign: row.utmCampaign || "",
+            utmTerm: row.utmTerm || "",
+            // Event mode always returns empty utmContent (props ignored for attribution)
+            utmContent: opts.mode === "event" ? "" : row.utmContent || "",
+            deviceType: row.deviceType || "",
+            country: row.country || "",
+            count: Number(row.count) || 0,
+        }));
+    }
+
 }

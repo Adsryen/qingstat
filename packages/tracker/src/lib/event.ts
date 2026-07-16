@@ -5,7 +5,11 @@ import {
     sanitizeTrackEvent,
     type TrackEventInput,
 } from "../shared/event";
-import { getHostnameAndPath, isLocalhostAddress } from "../shared/utils";
+import {
+    getHostnameAndPath,
+    getUtmParamsFromBrowserUrl,
+    isLocalhostAddress,
+} from "../shared/utils";
 
 export type { TrackEventInput };
 
@@ -26,18 +30,21 @@ export async function trackEvent(client: Client, input: TrackEventInput) {
         return;
     }
 
-    const { hostname, path } = getHostnameAndPath(
-        window.location.pathname + window.location.search || "/",
-        true,
-    );
+    const browserUrl =
+        window.location.pathname + window.location.search || "/";
+    const { hostname, path } = getHostnameAndPath(browserUrl, true);
     const identityContext = client.identity.getContext();
+    // Pass current-page UTM so event goals can attribute to campaign when
+    // the conversion fires on a UTM landing/deep page. Referrer stays empty
+    // (collect clears it for events to avoid noise / props collision).
+    const utmParams = getUtmParamsFromBrowserUrl(browserUrl);
 
     const params = buildCollectRequestParams(
         client.siteId,
         hostname,
         path,
         "",
-        {},
+        utmParams,
         undefined,
         identityContext,
         undefined,
