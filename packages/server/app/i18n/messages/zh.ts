@@ -185,6 +185,10 @@ export const zh: Messages = {
         topbar: {
             ready: "就绪",
         },
+        role: {
+            viewerBadge: "只读",
+            viewerNote: "当前为只读账号，无法修改站点配置",
+        },
         overview: {
             title: "概览",
             subtitle: "在统一后台管理站点并查看访问数据。",

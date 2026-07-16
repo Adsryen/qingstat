@@ -10,7 +10,7 @@ import {
     useLoaderData,
     useNavigation,
 } from "react-router";
-import { requireAuth } from "~/lib/auth";
+import { requireAuth, requirePermission } from "~/lib/auth";
 import {
     createGoal,
     deleteGoal,
@@ -50,7 +50,7 @@ export async function action({
     context,
     params,
 }: ActionFunctionArgs): Promise<ActionData> {
-    await requireAuth(request, context.cloudflare.env);
+    await requirePermission(request, context.cloudflare.env, "goals.write");
     const db = context.cloudflare.env.DB;
     if (!db) return { ok: false, error: "D1 not configured" };
     const siteId = params.siteId || "";

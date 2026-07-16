@@ -22,7 +22,7 @@ import {
 } from "~/components/ui/card";
 import { Button, buttonVariants } from "~/components/ui/button";
 import { SnippetModal } from "~/components/SnippetModal";
-import { requireAuth } from "~/lib/auth";
+import { requireAuth, requirePermission } from "~/lib/auth";
 import {
     createSite,
     deleteSite,
@@ -213,7 +213,7 @@ export async function action({
     request,
     context,
 }: ActionFunctionArgs): Promise<ActionData> {
-    await requireAuth(request, context.cloudflare.env);
+    await requirePermission(request, context.cloudflare.env, "sites.write");
     const messages = localeMessages(request);
 
     const db = context.cloudflare.env.DB;

@@ -192,6 +192,10 @@ export const en: Messages = {
         topbar: {
             ready: "Ready",
         },
+        role: {
+            viewerBadge: "Viewer",
+            viewerNote: "Read-only account — site configuration is locked",
+        },
         overview: {
             title: "Overview",
             subtitle: "Manage sites and review traffic from one console.",

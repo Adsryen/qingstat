@@ -3,12 +3,12 @@ import { requireAuth } from "~/lib/auth";
 import { useLocale } from "~/i18n/LocaleContext";
 import { cn } from "~/lib/utils";
 import { ThemeSwitcher } from "~/components/ThemeSwitcher";
+import type { Role } from "~/lib/permissions";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
-    await requireAuth(request, context.cloudflare.env);
+    const user = await requireAuth(request, context.cloudflare.env);
     return {
-        // reserved for future user/menu data
-        ok: true as const,
+        role: (user.role ?? "admin") as Role,
     };
 }
 
@@ -19,11 +19,12 @@ const navItems = [
 ];
 
 export default function ConsoleLayout() {
-    useLoaderData<typeof loader>();
+    const { role } = useLoaderData<typeof loader>();
     const { t, locale, setLocale } = useLocale();
     const location = useLocation();
     const navigation = useNavigation();
     const busy = navigation.state !== "idle";
+    const isViewer = role === "viewer";
 
     return (
         <div className="min-h-[70vh] flex flex-col md:flex-row gap-4 md:gap-6 -mt-2">
@@ -36,6 +37,11 @@ export default function ConsoleLayout() {
                         <div className="text-lg font-semibold text-foreground">
                             Qingstat
                         </div>
+                        {isViewer ? (
+                            <span className="mt-1 inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
+                                {t("console.role.viewerBadge")}
+                            </span>
+                        ) : null}
                     </div>
                     <nav className="flex md:flex-col gap-1 overflow-x-auto">
                         {navItems.map((item) => {
@@ -64,8 +70,13 @@ export default function ConsoleLayout() {
 
             <div className="flex-1 min-w-0 flex flex-col">
                 <header className="rounded-2xl border border-border/60 bg-card/80 shadow-sm px-4 py-3 mb-4 flex flex-wrap items-center justify-between gap-3">
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
                         {busy ? "…" : t("console.topbar.ready")}
+                        {isViewer ? (
+                            <span className="text-xs text-amber-800 dark:text-amber-200">
+                                · {t("console.role.viewerNote")}
+                            </span>
+                        ) : null}
                     </div>
                     <div className="flex items-center gap-2 flex-wrap justify-end">
                         <ThemeSwitcher />

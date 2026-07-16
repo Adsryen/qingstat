@@ -7,6 +7,8 @@ declare namespace Cloudflare {
 		CF_ACCOUNT_ID: string;
 		CF_JWT_SECRET: string;
 		CF_PASSWORD_HASH: string;
+		/** Optional bcrypt hash for read-only console viewer. */
+		CF_VIEWER_PASSWORD_HASH?: string;
 		CF_AUTH_ENABLED: string;
 		CF_TRACKER_SCRIPT_NAME: string;
 		CF_STORAGE_ENABLED: string;

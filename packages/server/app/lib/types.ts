@@ -1,4 +1,5 @@
 import type { TrafficSourceType } from "~/analytics/source-taxonomy";
+import type { Role } from "./permissions";
 
 export interface SearchFilters {
     path?: string;
@@ -31,4 +32,6 @@ export interface SearchFilters {
 
 export interface User {
     authenticated: boolean;
+    /** Present when authenticated (including auth-disabled mode → admin). */
+    role?: Role;
 }

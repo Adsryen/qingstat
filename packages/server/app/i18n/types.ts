@@ -181,6 +181,10 @@ export type Messages = {
         topbar: {
             ready: string;
         };
+        role: {
+            viewerBadge: string;
+            viewerNote: string;
+        };
         overview: {
             title: string;
             subtitle: string;
