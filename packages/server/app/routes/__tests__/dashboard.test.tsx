@@ -366,6 +366,11 @@ describe("Dashboard route", () => {
                         path: "/resources/events",
                         loader: () => ({ countsByProperty: [] }),
                     },
+                    {
+                        path: "/resources/goals",
+                        loader: () => ({ available: true, rows: [] }),
+                    },
+
 
 
                     {
@@ -700,6 +705,11 @@ describe("Dashboard route", () => {
                         path: "/resources/events",
                         loader: () => ({ countsByProperty: [] }),
                     },
+                    {
+                        path: "/resources/goals",
+                        loader: () => ({ available: true, rows: [] }),
+                    },
+
 
 
                     {

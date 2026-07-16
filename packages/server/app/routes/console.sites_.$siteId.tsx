@@ -183,6 +183,15 @@ export default function ConsoleSiteHub() {
                         >
                             {t("console.site.visitors")}
                         </a>
+                        <a
+                            href={`/console/sites/${encodeURIComponent(siteId)}/goals`}
+                            className={cn(
+                                buttonVariants({ variant: "outline" }),
+                                "rounded-xl",
+                            )}
+                        >
+                            Goals
+                        </a>
                     </CardContent>
                 </Card>
             </div>

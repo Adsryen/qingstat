@@ -66,6 +66,7 @@ import { VisitorLoyaltyCard } from "./resources.visitor-loyalty";
 import { PerformanceCard } from "./resources.performance";
 import { ErrorsCard } from "./resources.errors";
 import { EventsCard } from "./resources.events";
+import { GoalsCard } from "./resources.goals";
 import { useLocale } from "~/i18n/LocaleContext";
 import { getUser, isAuthEnabled } from "~/lib/auth";
 import { listSites } from "~/lib/sites";
@@ -366,6 +367,14 @@ export default function Dashboard() {
                 </div>
                 <div className="w-full mb-4">
                     <EventsCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        timezone={userTimezone}
+                    />
+                </div>
+                <div className="w-full mb-4">
+                    <GoalsCard
                         siteId={data.siteId}
                         interval={data.interval}
                         filters={data.filters}
