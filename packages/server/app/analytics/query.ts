@@ -230,6 +230,9 @@ function filtersToSql(filters: SearchFilters) {
     }
     // "include" → no extra clause
 
+    // Exclude JS error sample datapoints from normal pageview aggregates
+    filterStr += ` AND (${ColumnMappings.errorEvent} = 0 OR ${ColumnMappings.errorEvent} IS NULL)`;
+
     return filterStr;
 }
 
@@ -1712,4 +1715,101 @@ export class AnalyticsEngineAPI {
             },
         };
     }
+
+    async getPerformanceSummary(
+        siteId: string,
+        interval: string,
+        tz?: string,
+        filters: SearchFilters = {},
+    ): Promise<{ samples: number; avgTtfbMs: number | null; avgLcpMs: number | null }> {
+        const { startIntervalSql, endIntervalSql } = intervalToSql(interval, tz);
+        const filterStr = filtersToSql(filters);
+        const query = `
+            SELECT
+                SUM(_sample_interval) as samples,
+                SUM(${ColumnMappings.ttfbMs} * _sample_interval) as sumTtfb,
+                SUM(${ColumnMappings.lcpMs} * _sample_interval) as sumLcp,
+                SUM(if(${ColumnMappings.ttfbMs} > 0, _sample_interval, 0)) as ttfbSamples,
+                SUM(if(${ColumnMappings.lcpMs} > 0, _sample_interval, 0)) as lcpSamples
+            FROM metricsDataset
+            WHERE timestamp >= ${startIntervalSql} AND timestamp < ${endIntervalSql}
+                AND ${ColumnMappings.siteId} = '${siteId}'
+                AND (${ColumnMappings.ttfbMs} > 0 OR ${ColumnMappings.lcpMs} > 0)
+                ${filterStr}`;
+        type SelectionSet = {
+            samples: number;
+            sumTtfb: number;
+            sumLcp: number;
+            ttfbSamples: number;
+            lcpSamples: number;
+        };
+        const response = await this.query(query);
+        if (!response.ok) throw new Error(response.statusText);
+        const responseData =
+            (await response.json()) as AnalyticsQueryResult<SelectionSet>;
+        const row = responseData.data[0];
+        if (!row) {
+            return { samples: 0, avgTtfbMs: null, avgLcpMs: null };
+        }
+        const ttfbSamples = Number(row.ttfbSamples) || 0;
+        const lcpSamples = Number(row.lcpSamples) || 0;
+        return {
+            samples: Number(row.samples) || 0,
+            avgTtfbMs: ttfbSamples > 0 ? Number(row.sumTtfb) / ttfbSamples : null,
+            avgLcpMs: lcpSamples > 0 ? Number(row.sumLcp) / lcpSamples : null,
+        };
+    }
+
+    async getErrorSummary(
+        siteId: string,
+        interval: string,
+        tz?: string,
+        filters: SearchFilters = {},
+        limit: number = 10,
+    ): Promise<[string, number][]> {
+        const { startIntervalSql, endIntervalSql } = intervalToSql(interval, tz);
+        let filterStr = "";
+        const keys = [
+            "referrer",
+            "browserName",
+            "country",
+            "deviceType",
+            "osName",
+            "browserLanguage",
+        ] as const;
+        for (const key of keys) {
+            const value = filters[key];
+            if (value !== undefined && value !== "") {
+                filterStr += ` AND ${ColumnMappings[key]} = '${value}'`;
+            }
+        }
+        const botMode = filters.botTraffic ?? "exclude";
+        if (botMode === "exclude") {
+            filterStr += ` AND (${ColumnMappings.botScore} = 0 OR ${ColumnMappings.botScore} IS NULL)`;
+        } else if (botMode === "only") {
+            filterStr += ` AND ${ColumnMappings.botScore} = 1`;
+        }
+        const query = `
+            SELECT
+                ${ColumnMappings.path} as path,
+                SUM(_sample_interval) as count
+            FROM metricsDataset
+            WHERE timestamp >= ${startIntervalSql} AND timestamp < ${endIntervalSql}
+                AND ${ColumnMappings.siteId} = '${siteId}'
+                AND ${ColumnMappings.errorEvent} = 1
+                ${filterStr}
+            GROUP BY ${ColumnMappings.path}
+            ORDER BY count DESC
+            LIMIT ${limit}`;
+        type SelectionSet = { path: string; count: number };
+        const response = await this.query(query);
+        if (!response.ok) throw new Error(response.statusText);
+        const responseData =
+            (await response.json()) as AnalyticsQueryResult<SelectionSet>;
+        return responseData.data.map((row) => [
+            row.path || "(unknown)",
+            Number(row.count),
+        ]);
+    }
+
 }

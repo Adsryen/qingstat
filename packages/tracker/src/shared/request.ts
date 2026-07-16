@@ -10,6 +10,16 @@ export type ScreenSizeParams = {
     height?: number;
 };
 
+export type PerfSampleParams = {
+    ttfbMs?: number;
+    lcpMs?: number;
+};
+
+export type ErrorSampleParams = {
+    message?: string;
+    source?: string;
+};
+
 export function buildCollectRequestParams(
     siteId: string,
     hostname: string,
@@ -20,6 +30,8 @@ export function buildCollectRequestParams(
     identity?: IdentityRequestParams,
     clientPageviewId?: string,
     screenSize?: ScreenSizeParams,
+    perfSample?: PerfSampleParams,
+    errorSample?: ErrorSampleParams,
 ): CollectRequestParams {
     const params: CollectRequestParams = {
         p: path,
@@ -60,6 +72,29 @@ export function buildCollectRequestParams(
         screenSize.height > 0
     ) {
         params.sh = String(Math.round(screenSize.height));
+    }
+
+    if (perfSample) {
+        if (
+            typeof perfSample.ttfbMs === "number" &&
+            Number.isFinite(perfSample.ttfbMs) &&
+            perfSample.ttfbMs > 0
+        ) {
+            params.ttfb = String(Math.round(perfSample.ttfbMs));
+        }
+        if (
+            typeof perfSample.lcpMs === "number" &&
+            Number.isFinite(perfSample.lcpMs) &&
+            perfSample.lcpMs > 0
+        ) {
+            params.lcp = String(Math.round(perfSample.lcpMs));
+        }
+    }
+
+    if (errorSample) {
+        params.err = "1";
+        if (errorSample.message) params.em = errorSample.message;
+        if (errorSample.source) params.es = errorSample.source;
     }
 
     Object.assign(params, utmParams);

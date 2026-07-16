@@ -59,6 +59,9 @@ describe("metricsDataset v1 field registry", () => {
         );
         expect(getMetricsV1FieldBySlot("double8")?.status).toBe("used");
         expect(getMetricsV1FieldBySlot("double8")?.logicalName).toBe("botScore");
+        expect(getMetricsV1FieldBySlot("double9")?.logicalName).toBe("ttfbMs");
+        expect(getMetricsV1FieldBySlot("double10")?.logicalName).toBe("lcpMs");
+        expect(getMetricsV1FieldBySlot("double11")?.logicalName).toBe("errorEvent");
     });
 
     test("documents legacy visitor/session/bounce semantics as non-reusable", () => {

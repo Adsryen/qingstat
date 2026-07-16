@@ -454,8 +454,36 @@ export async function collectRequestHandler(
         screenWidth: bucketScreenDimension(params.sw),
         screenHeight: bucketScreenDimension(params.sh),
         botScore: botScoreFromUserAgent(userAgent),
+        ttfbMs: 0,
+        lcpMs: 0,
+        errorEvent: 0,
         identity: identityParams.identity,
     };
+
+    // Performance sample (optional query params)
+    if (params.ttfb) {
+        const n = Number(params.ttfb);
+        if (Number.isFinite(n) && n > 0) {
+            data.ttfbMs = Math.min(60000, Math.round(n / 50) * 50);
+        }
+    }
+    if (params.lcp) {
+        const n = Number(params.lcp);
+        if (Number.isFinite(n) && n > 0) {
+            data.lcpMs = Math.min(60000, Math.round(n / 50) * 50);
+        }
+    }
+    // JS error sample: mark double11 and store redacted message in path for MVP aggregation
+    if (params.err === "1") {
+        data.errorEvent = 1;
+        data.newVisitor = 0;
+        data.bounce = 0;
+        const em = (params.em || "(unknown)").slice(0, 120);
+        const es = (params.es || "").slice(0, 80);
+        data.path = `/__error__/${em}${es ? ` @ ${es}` : ""}`.slice(0, 200);
+        data.ttfbMs = 0;
+        data.lcpMs = 0;
+    }
 
     // Location is derived from Cloudflare edge geolocation — city/region level.
     // Raw client IPs are intentionally not stored (privacy + map-ready admin areas).
@@ -578,6 +606,14 @@ interface DataPoint {
     screenHeight?: number;
     /** 1 = bot, 0 = human/unknown */
     botScore?: number;
+    /** sampled TTFB ms (bucketed) */
+    ttfbMs?: number;
+    /** sampled load timing ms (bucketed) */
+    lcpMs?: number;
+    /** 1 = JS error sample datapoint */
+    errorEvent?: number;
+    errorMessage?: string;
+    errorSource?: string;
 }
 
 // NOTE: Cloudflare Analytics Engine has limits on total number of bytes, number of fields, etc.
@@ -624,6 +660,9 @@ export function writeDataPoint(
             data.screenHeight ?? 0,
             // 0 = human/unknown (missing UA), 1 = bot
             data.botScore ?? 0,
+            data.ttfbMs ?? 0,
+            data.lcpMs ?? 0,
+            data.errorEvent ?? 0,
         ],
     };
 

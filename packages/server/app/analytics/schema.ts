@@ -67,4 +67,11 @@ export const ColumnMappings = {
 
     /** 1 = bot/spider UA, 0 = human or unknown (missing UA is 0) */
     botScore: "double8",
+
+    /** TTFB ms (50ms buckets); 0 = not sampled / missing */
+    ttfbMs: "double9",
+    /** Coarse page-ready / load timing ms (50ms buckets); 0 = not sampled */
+    lcpMs: "double10",
+    /** 1 = this datapoint is a JS error sample (not a pageview metric) */
+    errorEvent: "double11",
 } as const;

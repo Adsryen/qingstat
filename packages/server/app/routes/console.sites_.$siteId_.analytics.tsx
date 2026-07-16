@@ -62,6 +62,8 @@ import { TimeSeriesCard } from "./resources.timeseries";
 import { StatsCard } from "./resources.stats";
 import { NewReturningCard } from "./resources.new-returning";
 import { VisitorLoyaltyCard } from "./resources.visitor-loyalty";
+import { PerformanceCard } from "./resources.performance";
+import { ErrorsCard } from "./resources.errors";
 import { requireAuth } from "~/lib/auth";
 import { useLocale } from "~/i18n/LocaleContext";
 
@@ -310,6 +312,20 @@ export default function Dashboard() {
                 </div>
                 <div className="w-full mb-4">
                     <VisitorLoyaltyCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        timezone={userTimezone}
+                    />
+                </div>
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
+                    <PerformanceCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        timezone={userTimezone}
+                    />
+                    <ErrorsCard
                         siteId={data.siteId}
                         interval={data.interval}
                         filters={data.filters}

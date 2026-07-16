@@ -238,6 +238,9 @@ describe("collectRequestHandler", () => {
                 0, // screenWidth unknown
                 0, // screenHeight unknown
                 0, // botScore human
+                0, // ttfbMs
+                0, // lcpMs
+                0, // errorEvent
             ],
             indexes: [
                 "example", // site id is index
@@ -269,6 +272,9 @@ describe("collectRequestHandler", () => {
                 0, // screenWidth
                 0, // screenHeight,
                 0, // botScore
+                0, // ttfbMs
+                0, // lcpMs
+                0, // errorEvent
             ],
         );
     });
@@ -303,6 +309,9 @@ describe("collectRequestHandler", () => {
                 0, // screenWidth
                 0, // screenHeight,
                 0, // botScore
+                0, // ttfbMs
+                0, // lcpMs
+                0, // errorEvent
             ],
         );
     });
@@ -342,6 +351,9 @@ describe("collectRequestHandler", () => {
                 0, // screenWidth
                 0, // screenHeight,
                 0, // botScore
+                0, // ttfbMs
+                0, // lcpMs
+                0, // errorEvent
             ],
         );
     });
@@ -376,6 +388,9 @@ describe("collectRequestHandler", () => {
                 0, // screenWidth
                 0, // screenHeight,
                 0, // botScore
+                0, // ttfbMs
+                0, // lcpMs
+                0, // errorEvent
             ],
         );
     });
@@ -410,6 +425,9 @@ describe("collectRequestHandler", () => {
                 0, // screenWidth
                 0, // screenHeight,
                 0, // botScore
+                0, // ttfbMs
+                0, // lcpMs
+                0, // errorEvent
             ],
         );
     });
@@ -452,6 +470,9 @@ describe("collectRequestHandler", () => {
                 0, // screenWidth
                 0, // screenHeight,
                 0, // botScore
+                0, // ttfbMs
+                0, // lcpMs
+                0, // errorEvent
             ],
         );
     });
@@ -496,6 +517,9 @@ describe("collectRequestHandler", () => {
                 0, // screenWidth
                 0, // screenHeight,
                 0, // botScore
+                0, // ttfbMs
+                0, // lcpMs
+                0, // errorEvent
             ],
         );
     });
@@ -594,7 +618,7 @@ describe("collectRequestHandler", () => {
         expect(writeDataPoint).toHaveBeenCalled();
         const datapoint = (writeDataPoint as Mock).mock.calls[0][0];
         expect(datapoint.blobs).toHaveLength(20);
-        expect(datapoint.doubles).toHaveLength(8);
+        expect(datapoint.doubles).toHaveLength(11);
         expect(datapoint.blobs).not.toContain("203.0.113.10");
         expect(datapoint.blobs).not.toContain("198.51.100.20");
     });
@@ -639,7 +663,7 @@ describe("collectRequestHandler", () => {
 
         const datapoint = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock.calls[0][0];
         expect(datapoint.blobs).toHaveLength(20);
-        expect(datapoint.doubles).toHaveLength(8);
+        expect(datapoint.doubles).toHaveLength(11);
         expect(datapoint.blobs).not.toContain("client-pv-123");
     });
 
@@ -760,7 +784,7 @@ describe("collectRequestHandler", () => {
 
         const doubles = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock
             .calls[0][0].doubles;
-        expect(doubles).toHaveLength(8);
+        expect(doubles).toHaveLength(11);
         expect(doubles[5]).toBe(1920); // screenWidth bucketed
         expect(doubles[6]).toBe(1080); // screenHeight bucketed
         expect(doubles[7]).toBe(0); // botScore
@@ -804,7 +828,7 @@ describe("collectRequestHandler", () => {
         );
         await collectRequestHandler(request as any, env);
         const doubles = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock.calls[0][0].doubles;
-        expect(doubles).toHaveLength(8);
+        expect(doubles).toHaveLength(11);
         expect(doubles[7]).toBe(1);
     });
 

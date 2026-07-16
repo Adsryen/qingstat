@@ -8,14 +8,78 @@ import {
     isLocalhostAddress,
 } from "../shared/utils";
 import { buildCollectRequestParams } from "../shared/request";
+import { readNavigationPerf, shouldSamplePerf } from "./performance";
+import {
+    sanitizeErrorEvent,
+    shouldSampleError,
+    ERROR_MAX_PER_PAGE,
+} from "./errors";
 
 export type TrackPageviewOpts = {
     url?: string;
     referrer?: string;
 };
 
+let errorHookInstalled = false;
+let errorsReportedThisPage = 0;
+
+function installErrorHooks(client: Client) {
+    if (errorHookInstalled || typeof window === "undefined") return;
+    errorHookInstalled = true;
+
+    const report = (message: string, source?: string) => {
+        if (errorsReportedThisPage >= ERROR_MAX_PER_PAGE) return;
+        if (!shouldSampleError()) return;
+        errorsReportedThisPage += 1;
+        const sanitized = sanitizeErrorEvent({ message, source });
+        const identityContext = client.identity.getContext();
+        const { hostname, path } = getHostnameAndPath(
+            window.location.pathname + window.location.search,
+            true,
+        );
+        const params = buildCollectRequestParams(
+            client.siteId,
+            hostname,
+            path,
+            "",
+            {},
+            undefined,
+            identityContext,
+            undefined,
+            undefined,
+            undefined,
+            sanitized,
+        );
+        try {
+            makeRequest(client.reporterUrl, params);
+        } catch {
+            // swallow
+        }
+    };
+
+    window.addEventListener("error", (event) => {
+        report(
+            event.message || String(event.error || "error"),
+            event.filename || "",
+        );
+    });
+    window.addEventListener("unhandledrejection", (event) => {
+        const reason = event.reason;
+        const message =
+            reason instanceof Error
+                ? reason.message
+                : typeof reason === "string"
+                  ? reason
+                  : "unhandledrejection";
+        report(message, "");
+    });
+}
+
 export function autoTrackPageviews(client: Client) {
+    installErrorHooks(client);
+    errorsReportedThisPage = 0;
     const cleanupFn = instrumentHistoryBuiltIns(() => {
+        errorsReportedThisPage = 0;
         void trackPageview(client);
     });
 
@@ -127,6 +191,47 @@ export async function trackPageview(
         // ignore environments without screen
     }
 
+    let perfSample: { ttfbMs?: number; lcpMs?: number } | undefined;
+    try {
+        if (shouldSamplePerf() && typeof performance !== "undefined") {
+            // Defer slightly so navigation timing is populated
+            const read = () => readNavigationPerf(performance);
+            // If timing not ready yet, still send 0s after short wait via sync best-effort
+            const first = read();
+            if (first.ttfbMs > 0 || first.lcpMs > 0) {
+                perfSample = first;
+            } else {
+                // fallback: try again after load (fire-and-forget second beacon only if needed)
+                const sendPerf = () => {
+                    const later = readNavigationPerf(performance);
+                    if (later.ttfbMs <= 0 && later.lcpMs <= 0) return;
+                    const params = buildCollectRequestParams(
+                        client.siteId,
+                        hostname,
+                        path,
+                        referrer,
+                        utmParams,
+                        hitType,
+                        identityContext,
+                        clientPageviewId,
+                        screenSize,
+                        later,
+                    );
+                    makeRequest(client.reporterUrl, params);
+                };
+                if (document.readyState === "complete") {
+                    setTimeout(sendPerf, 0);
+                } else {
+                    window.addEventListener("load", () => setTimeout(sendPerf, 0), {
+                        once: true,
+                    });
+                }
+            }
+        }
+    } catch {
+        // ignore perf failures
+    }
+
     const requestParams = buildCollectRequestParams(
         client.siteId,
         hostname,
@@ -137,6 +242,7 @@ export async function trackPageview(
         identityContext,
         clientPageviewId,
         screenSize,
+        perfSample,
     );
 
     makeRequest(client.reporterUrl, requestParams);

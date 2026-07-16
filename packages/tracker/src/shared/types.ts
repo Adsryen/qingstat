@@ -16,6 +16,16 @@ export type CollectRequestParams = {
     ht?: string; // hit type
     sw?: string; // screen width (CSS px)
     sh?: string; // screen height (CSS px)
+    /** TTFB ms (sampled, bucketed on server) */
+    ttfb?: string;
+    /** Load timing ms (sampled) */
+    lcp?: string;
+    /** 1 when this is a JS error sample */
+    err?: string;
+    /** sanitized error message */
+    em?: string;
+    /** sanitized error source path */
+    es?: string;
     [key: string]: string | undefined; // Allow additional string properties
 } & UtmParams;
 
