@@ -55,7 +55,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
             filters,
             1,
         );
-        pathCounts = allPaths.map((row) => {
+        pathCounts = allPaths.map((row: [string, number] | [string, number, number]) => {
             const path = String(row[0]);
             const viewCount = row.length > 2 ? Number(row[2]) : Number(row[1]);
             return [path, viewCount] as [string, number];
@@ -71,7 +71,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
             filters,
             100,
         );
-        eventCounts = events.map(([name, count]) => [
+        eventCounts = events.map(([name, count]: [string, number]) => [
             `/__event__/${name}`,
             count,
         ]);
