@@ -30,9 +30,9 @@ describe("sanitizeTrackEvent", () => {
     const r = sanitizeTrackEvent({ name: "evt", props });
     expect(r.ok).toBe(true);
     if (r.ok) {
-      const obj = JSON.parse(r.event.propsJson);
+      const obj = JSON.parse(r.event.propsJson) as Record<string, string>;
       expect(Object.keys(obj).length).toBe(8);
-      expect(Object.values(obj)[0].length).toBe(128);
+      expect(Object.values(obj)[0]!.length).toBe(128);
     }
   });
 });
