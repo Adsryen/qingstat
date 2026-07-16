@@ -370,6 +370,11 @@ describe("Dashboard route", () => {
                         path: "/resources/goals",
                         loader: () => ({ available: true, rows: [] }),
                     },
+                    {
+                        path: "/resources/funnels",
+                        loader: () => ({ available: true, results: [] }),
+                    },
+
 
 
 
@@ -709,6 +714,11 @@ describe("Dashboard route", () => {
                         path: "/resources/goals",
                         loader: () => ({ available: true, rows: [] }),
                     },
+                    {
+                        path: "/resources/funnels",
+                        loader: () => ({ available: true, results: [] }),
+                    },
+
 
 
 
