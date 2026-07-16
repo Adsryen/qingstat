@@ -415,6 +415,7 @@ describe("Dashboard route", () => {
         expect(screen.getByText("Browser")).toBeInTheDocument();
         expect(screen.getByText("Country")).toBeInTheDocument();
         expect(screen.getByText("Device")).toBeInTheDocument();
+        expect(screen.getByText("Device Model")).toBeInTheDocument();
         expect(screen.getByText("OS")).toBeInTheDocument();
         expect(screen.getByText("Language")).toBeInTheDocument();
         expect(screen.getByText("UTM Source")).toBeInTheDocument();
