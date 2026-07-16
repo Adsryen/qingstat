@@ -65,6 +65,7 @@ import { NewReturningCard } from "./resources.new-returning";
 import { VisitorLoyaltyCard } from "./resources.visitor-loyalty";
 import { PerformanceCard } from "./resources.performance";
 import { ErrorsCard } from "./resources.errors";
+import { EventsCard } from "./resources.events";
 import { requireAuth } from "~/lib/auth";
 import { useLocale } from "~/i18n/LocaleContext";
 
@@ -327,6 +328,14 @@ export default function Dashboard() {
                         timezone={userTimezone}
                     />
                     <ErrorsCard
+                        siteId={data.siteId}
+                        interval={data.interval}
+                        filters={data.filters}
+                        timezone={userTimezone}
+                    />
+                </div>
+                <div className="w-full mb-4">
+                    <EventsCard
                         siteId={data.siteId}
                         interval={data.interval}
                         filters={data.filters}

@@ -1812,4 +1812,49 @@ export class AnalyticsEngineAPI {
         ]);
     }
 
+
+    /**
+     * Aggregate custom events (errorEvent = 2) by event name (from path /__event__/{name}).
+     */
+    async getCustomEventSummary(
+        siteId: string,
+        interval: string,
+        tz?: string,
+        filters: SearchFilters = {},
+        limit: number = 20,
+    ): Promise<[eventName: string, count: number][]> {
+        const { startIntervalSql, endIntervalSql } = intervalToSql(interval, tz);
+        let filterStr = "";
+        const botMode = filters.botTraffic ?? "exclude";
+        if (botMode === "exclude") {
+            filterStr += ` AND (${ColumnMappings.botScore} = 0 OR ${ColumnMappings.botScore} IS NULL)`;
+        } else if (botMode === "only") {
+            filterStr += ` AND ${ColumnMappings.botScore} = 1`;
+        }
+        const query = `
+            SELECT
+                ${ColumnMappings.path} as path,
+                SUM(_sample_interval) as count
+            FROM metricsDataset
+            WHERE timestamp >= ${startIntervalSql} AND timestamp < ${endIntervalSql}
+                AND ${ColumnMappings.siteId} = '${siteId}'
+                AND ${ColumnMappings.errorEvent} = 2
+                ${filterStr}
+            GROUP BY ${ColumnMappings.path}
+            ORDER BY count DESC
+            LIMIT ${limit}`;
+        type SelectionSet = { path: string; count: number };
+        const response = await this.query(query);
+        if (!response.ok) throw new Error(response.statusText);
+        const responseData =
+            (await response.json()) as AnalyticsQueryResult<SelectionSet>;
+        return responseData.data.map((row) => {
+            const path = row.path || "";
+            const name = path.startsWith("/__event__/")
+                ? path.slice("/__event__/".length)
+                : path || "(unknown)";
+            return [name, Number(row.count)] as [string, number];
+        });
+    }
+
 }

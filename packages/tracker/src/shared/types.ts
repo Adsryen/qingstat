@@ -26,6 +26,10 @@ export type CollectRequestParams = {
     em?: string;
     /** sanitized error source path */
     es?: string;
+    /** custom event name (trackEvent) */
+    en?: string;
+    /** custom event props JSON */
+    ep?: string;
     [key: string]: string | undefined; // Allow additional string properties
 } & UtmParams;
 

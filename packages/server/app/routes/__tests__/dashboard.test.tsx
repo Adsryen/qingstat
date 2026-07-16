@@ -362,6 +362,11 @@ describe("Dashboard route", () => {
                         path: "/resources/errors",
                         loader: () => ({ countsByProperty: [] }),
                     },
+                    {
+                        path: "/resources/events",
+                        loader: () => ({ countsByProperty: [] }),
+                    },
+
 
                     {
                         path: "/resources/resolution",
@@ -691,6 +696,11 @@ describe("Dashboard route", () => {
                         path: "/resources/errors",
                         loader: () => ({ countsByProperty: [] }),
                     },
+                    {
+                        path: "/resources/events",
+                        loader: () => ({ countsByProperty: [] }),
+                    },
+
 
                     {
                         path: "/resources/resolution",

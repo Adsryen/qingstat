@@ -847,6 +847,54 @@ describe("collectRequestHandler", () => {
         expect(doubles[7]).toBe(0);
     });
 
+    test("writes custom event with errorEvent=2 and path prefix", async () => {
+        const env = {
+            WEB_COUNTER_AE: { writeDataPoint: vi.fn() } as AnalyticsEngineDataset,
+        } as Env;
+        const request = generateRequestParams({
+            "user-agent":
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36",
+        });
+        request.url =
+            "https://example.com/collect?" +
+            new URLSearchParams({
+                sid: "example",
+                h: "example.com",
+                p: "/page",
+                r: "",
+                en: "signup_click",
+                ep: JSON.stringify({ category: "cta" }),
+            }).toString();
+        await collectRequestHandler(request as any, env);
+        expect(env.WEB_COUNTER_AE.writeDataPoint).toHaveBeenCalled();
+        const dp = (env.WEB_COUNTER_AE.writeDataPoint as Mock).mock.calls[0][0];
+        expect(dp.blobs[2]).toBe("/__event__/signup_click");
+        expect(dp.blobs[14]).toContain("category");
+        expect(dp.doubles[10]).toBe(2); // errorEvent custom
+        expect(dp.doubles[0]).toBe(0); // not a visitor hit
+    });
+
+    test("rejects invalid custom event names", async () => {
+        const env = {
+            WEB_COUNTER_AE: { writeDataPoint: vi.fn() } as AnalyticsEngineDataset,
+        } as Env;
+        const request = generateRequestParams({
+            "user-agent": "Mozilla/5.0",
+        });
+        request.url =
+            "https://example.com/collect?" +
+            new URLSearchParams({
+                sid: "example",
+                h: "example.com",
+                p: "/",
+                en: "bad name",
+            }).toString();
+        const response = await collectRequestHandler(request as any, env);
+        expect(response.status).toBe(400);
+        expect(env.WEB_COUNTER_AE.writeDataPoint).not.toHaveBeenCalled();
+    });
+
+
     test("rejects collect when registry site is disabled", async () => {
         const env = {
             WEB_COUNTER_AE: {

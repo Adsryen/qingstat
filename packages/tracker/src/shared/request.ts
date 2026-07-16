@@ -20,6 +20,11 @@ export type ErrorSampleParams = {
     source?: string;
 };
 
+export type CustomEventParams = {
+    name: string;
+    propsJson?: string;
+};
+
 export function buildCollectRequestParams(
     siteId: string,
     hostname: string,
@@ -32,6 +37,7 @@ export function buildCollectRequestParams(
     screenSize?: ScreenSizeParams,
     perfSample?: PerfSampleParams,
     errorSample?: ErrorSampleParams,
+    customEvent?: CustomEventParams,
 ): CollectRequestParams {
     const params: CollectRequestParams = {
         p: path,
@@ -95,6 +101,11 @@ export function buildCollectRequestParams(
         params.err = "1";
         if (errorSample.message) params.em = errorSample.message;
         if (errorSample.source) params.es = errorSample.source;
+    }
+
+    if (customEvent) {
+        params.en = customEvent.name;
+        if (customEvent.propsJson) params.ep = customEvent.propsJson;
     }
 
     Object.assign(params, utmParams);

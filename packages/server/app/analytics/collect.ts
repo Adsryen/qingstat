@@ -492,6 +492,25 @@ export async function collectRequestHandler(
         data.lcpMs = 0;
     }
 
+    // Custom event: errorEvent=2, path=/__event__/{name}, props in utmContent (blob15)
+    if (params.en && params.err !== "1") {
+        const rawName = String(params.en).trim();
+        if (!/^[a-zA-Z][a-zA-Z0-9_.:-]{0,63}$/.test(rawName)) {
+            return new Response("Invalid event name", { status: 400 });
+        }
+        data.errorEvent = 2;
+        data.newVisitor = 0;
+        data.bounce = 0;
+        data.path = `/__event__/${rawName}`.slice(0, 200);
+        // props JSON (already size-limited client-side); hard cap 512
+        const ep = (params.ep || "{}").slice(0, 512);
+        data.utmContent = ep;
+        data.ttfbMs = 0;
+        data.lcpMs = 0;
+        // keep host from request; drop referrer for events to reduce noise
+        data.referrer = "";
+    }
+
     // Location is derived from Cloudflare edge geolocation — city/region level.
     // Raw client IPs are intentionally not stored (privacy + map-ready admin areas).
     // see: https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties
